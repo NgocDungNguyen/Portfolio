@@ -42,6 +42,7 @@
             position: fixed; top: -50%; left: -50%; width: 200%; height: 200%;
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.15'/%3E%3C/svg%3E");
             opacity: 0.3; pointer-events: none; z-index: 9998; animation: grain 8s steps(10) infinite;
+            will-change: transform; transform: translateZ(0);
         }
         @keyframes grain { 0%, 100% { transform: translate(0, 0); } 10% { transform: translate(-5%, -10%); } 30% { transform: translate(3%, -15%); } 50% { transform: translate(12%, 9%); } 70% { transform: translate(9%, 4%); } 90% { transform: translate(-1%, 7%); } }
         .cursor-dot { position: fixed; width: 8px; height: 8px; background: var(--accent); border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%, -50%); mix-blend-mode: difference; }
@@ -52,9 +53,13 @@
             position: fixed; bottom: 2rem; right: 2rem; background: var(--accent); color: #fff;
             padding: 1rem 2rem; font-family: 'Archivo Black', sans-serif; text-transform: uppercase;
             font-size: 0.9rem; border-radius: 50px; z-index: 1000; cursor: none;
-            animation: pulse 2s infinite; text-decoration: none;
+            text-decoration: none;
         }
-        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255, 60, 0, 0.4); } 70% { box-shadow: 0 0 0 20px rgba(255, 60, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 60, 0, 0); } }
+        .sticky-cta::after {
+            content: ''; position: absolute; inset: 0; border-radius: 50px; z-index: -1;
+            background: rgba(255, 60, 0, 0.5); animation: pulse 2s infinite; will-change: transform, opacity;
+        }
+        @keyframes pulse { 0% { transform: scale(1); opacity: 0.7; } 70% { transform: scale(1.4); opacity: 0; } 100% { transform: scale(1.4); opacity: 0; } }
 
         /* Layouts */
         section { padding: 8rem 4rem; position: relative; z-index: 1; }
@@ -80,8 +85,25 @@
         /* Image Utilities */
         .img-placeholder { background: #111; overflow: hidden; position: relative; border: 1px solid #222; }
         body.light-mode .img-placeholder { background: #ddd; border: 1px solid #ccc; }
-        .img-placeholder img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
+        .img-placeholder img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; cursor: pointer; }
         .img-placeholder:hover img { transform: scale(1.05); }
+
+        /* Lightbox */
+        .lightbox {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 10001; cursor: pointer;
+            display: none; align-items: center; justify-content: center; padding: 4rem 2rem;
+            opacity: 0; transition: opacity 0.3s ease;
+        }
+        .lightbox.active { display: flex; opacity: 1; }
+        .lightbox img { max-width: 90vw; max-height: 85vh; object-fit: contain; box-shadow: 0 20px 60px rgba(0,0,0,0.6); }
+        .lightbox-close {
+            position: absolute; top: 2rem; right: 2rem; width: 48px; height: 48px;
+            border: 1px solid rgba(255,255,255,0.4); border-radius: 50%; background: transparent;
+            color: #fff; font-size: 1.6rem; line-height: 1; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: background 0.3s, border-color 0.3s, transform 0.3s;
+        }
+        .lightbox-close:hover { background: var(--accent); border-color: var(--accent); transform: rotate(90deg); }
         .img-label { position: absolute; bottom: 10px; left: 10px; font-size: 0.7rem; background: rgba(0,0,0,0.7); padding: 4px 8px; color: #fff; font-family: monospace; }
         
         /* Varying Grid Layouts */
@@ -672,15 +694,38 @@
         });
         gsap.to('.hero .subtitle', { opacity: 1, duration: 1, delay: 1 });
 
-        // 5. Staggered Reveals
-        gsap.utils.toArray('.reveal-up').forEach(el => {
-            gsap.to(el, {
-                opacity: 1, y: 0, duration: 1, ease: 'power3.out',
-                scrollTrigger: { trigger: el, start: 'top 85%' }
+        // 5. Staggered Reveals (batched for scroll performance)
+        ScrollTrigger.batch('.reveal-up', {
+            start: 'top 85%',
+            onEnter: batch => gsap.to(batch, {
+                opacity: 1, y: 0, duration: 1, ease: 'power3.out', stagger: 0.1
+            })
+        });
+
+        // 6. Image Lightbox
+        const lightbox = document.createElement('div');
+        lightbox.className = 'lightbox';
+        lightbox.innerHTML = '<button class="lightbox-close" aria-label="Close image">&times;</button><img src="" alt="">';
+        document.body.appendChild(lightbox);
+        const lightboxImg = lightbox.querySelector('img');
+
+        document.querySelectorAll('.img-placeholder img').forEach(img => {
+            img.addEventListener('click', () => {
+                lightboxImg.src = img.currentSrc || img.src;
+                lightboxImg.alt = img.alt;
+                lightbox.classList.add('active');
             });
         });
 
-        // 6. Light/Dark Mode Toggles
+        function closeLightbox() {
+            lightbox.classList.remove('active');
+            lightboxImg.src = '';
+        }
+        lightbox.querySelector('.lightbox-close').addEventListener('click', closeLightbox);
+        lightbox.addEventListener('click', e => { if (e.target === lightbox) closeLightbox(); });
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+
+        // 7. Light/Dark Mode Toggles
         const lightSections = document.querySelectorAll('.light-section');
         lightSections.forEach(sec => {
             ScrollTrigger.create({
