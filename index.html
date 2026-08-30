@@ -405,7 +405,9 @@ html.js [data-rv].in{
 }
 
 /* light sections */
-section.light-section{ color:var(--light-ink); }
+/* light sections take their ink from body.light-mode; if the theme toggle never
+   fires (JS/gsap failure) they stay readable white-on-dark rather than dark-on-dark */
+body.light-mode section.light-section{ color:var(--light-ink); }
 
 .spread{
   display:grid; grid-template-columns:1fr 1fr; gap:clamp(2rem,5vw,4.5rem); align-items:center;
@@ -1789,9 +1791,15 @@ if (!REDUCE && fgMap.length && 'IntersectionObserver' in window){
  * 16. Light / dark section switching (ScrollTrigger)
  * ------------------------------------------------------------------ */
 if (window.gsap){
-  qsa('.light-section').forEach(function(sec){
+  var lightSecs = qsa('.light-section');
+  lightSecs.forEach(function(sec, i){
+    var isLast = (i === lightSecs.length - 1);
     ScrollTrigger.create({
-      trigger: sec, start: 'top 35%', end: 'bottom 35%',
+      trigger: sec,
+      start: isLast ? 'top 70%' : 'top 35%',
+      // the last light section (contact) has nothing after it — hold the theme
+      // until the page bottom so its light-designed content never renders on dark
+      end: isLast ? 'bottom top' : 'bottom 35%',
       onToggle: function(self){ document.body.classList.toggle('light-mode', self.isActive); }
     });
   });
