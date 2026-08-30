@@ -1,0 +1,19 @@
+# Reference projects — analysed in PORTFOLIO-BUILD-GUIDE.md, not part of the deployed site.
+# "Sample Content/kage-optimise" has NO license (reference only) — do not publish it.
+# Each contains a nested .git/ that confuses tooling.
+Sample Content/
+Sample Landing/
+Sample Portfolio/
+
+# OS / editor
+.DS_Store
+._*
+Thumbs.db
+
+# Scratch
+*.log
+
+# Test / tooling artifacts (root-level screenshots only — images/ is unaffected)
+.playwright-mcp/
+/*.png
+.vscode/

@@ -1,738 +1,2062 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>June Nguyen — The Architecture of a Leader</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Archivo+Black&family=Space+Grotesk:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --pure-black: #050505;
-            --pure-white: #ffffff;
-            --accent: #ff3c00;
-            --light-bg: #f4f1ea;
-            --gray-text: #a0a0a0;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="June Nguyen (Nguyen Ngoc Dung) — final-year IT student and Business Analyst at RMIT University Vietnam. Enterprise systems, agile delivery, six years of competitive robotics, and leadership built one team at a time.">
+<title>June Nguyen — Portfolio 2026</title>
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        html { scroll-behavior: smooth; }
+<!-- First inline script: gate every pre-animation hidden state behind html.js -->
+<script>document.documentElement.className += ' js';</script>
 
-        body {
-            background: var(--pure-black);
-            color: var(--pure-white);
-            font-family: 'Space Grotesk', sans-serif;
-            overflow-x: hidden;
-            cursor: none;
-            transition: background-color 0.8s ease, color 0.8s ease;
-        }
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Playfair+Display:ital@0;1&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-        body.light-mode {
-            background: var(--light-bg);
-            color: var(--pure-black);
-        }
+<style>
+/* ============================================================================
+   June Nguyen — Portfolio 2026
+   One hand-authored file. Inline style + one inline script (+ vendored Three.js).
+   Hero systems adapted from ThreeUI SylvaHero by Meng To — MIT
+   All scroll / reveal / handoff techniques written from scratch.
+   ========================================================================== */
 
-        h1, h2, h3 { font-family: 'Playfair Display', serif; font-weight: 400; line-height: 0.95; }
-        .bold-type { font-family: 'Archivo Black', sans-serif; text-transform: uppercase; letter-spacing: -1px; }
-        p { line-height: 1.6; }
+/* ---- Tokens ------------------------------------------------------------- */
+:root{
+  --pure-black:#050505;
+  --near-black:#0a0705;
+  --pure-white:#f7f5f2;
+  --accent:#ff3c00;
+  --accent-soft:#ff6a3d;
+  --light-bg:#f4f1ea;
+  --light-ink:#161310;
+  --gray-text:#a7a29b;
+  --line:#242220;
 
-        /* Film Grain & Cursor */
-        .grain {
-            position: fixed; top: -50%; left: -50%; width: 200%; height: 200%;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.15'/%3E%3C/svg%3E");
-            opacity: 0.3; pointer-events: none; z-index: 9998; animation: grain 8s steps(10) infinite;
-            will-change: transform; transform: translateZ(0);
-        }
-        @keyframes grain { 0%, 100% { transform: translate(0, 0); } 10% { transform: translate(-5%, -10%); } 30% { transform: translate(3%, -15%); } 50% { transform: translate(12%, 9%); } 70% { transform: translate(9%, 4%); } 90% { transform: translate(-1%, 7%); } }
-        .cursor-dot { position: fixed; width: 8px; height: 8px; background: var(--accent); border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%, -50%); mix-blend-mode: difference; }
-        .progress-bar { position: fixed; top: 0; left: 0; height: 4px; background: var(--accent); width: 0%; z-index: 10000; }
+  --ease:cubic-bezier(.22,.61,.36,1);
+  --ease-out:cubic-bezier(.16,1,.3,1);
 
-        /* Sticky CTA */
-        .sticky-cta {
-            position: fixed; bottom: 2rem; right: 2rem; background: var(--accent); color: #fff;
-            padding: 1rem 2rem; font-family: 'Archivo Black', sans-serif; text-transform: uppercase;
-            font-size: 0.9rem; border-radius: 50px; z-index: 1000; cursor: none;
-            text-decoration: none;
-        }
-        .sticky-cta::after {
-            content: ''; position: absolute; inset: 0; border-radius: 50px; z-index: -1;
-            background: rgba(255, 60, 0, 0.5); animation: pulse 2s infinite; will-change: transform, opacity;
-        }
-        @keyframes pulse { 0% { transform: scale(1); opacity: 0.7; } 70% { transform: scale(1.4); opacity: 0; } 100% { transform: scale(1.4); opacity: 0; } }
+  /* Sylva proportional unit — every hero dimension is calc(N * var(--u)) */
+  --u:calc(100vw / 1440);
 
-        /* Layouts */
-        section { padding: 8rem 4rem; position: relative; z-index: 1; }
-        @media (max-width: 768px) { section { padding: 5rem 1.5rem; } .sticky-cta { display: none; } }
-        .chapter-num { font-family: 'Space Grotesk', sans-serif; font-size: 1rem; color: var(--accent); margin-bottom: 1rem; display: block; letter-spacing: 2px; }
+  --pad:clamp(1.5rem, 5vw, 4rem);
+  --maxw:1400px;
+}
+@media (min-width:1800px){ :root{ --u:calc(1800px / 1440); } }
+@media (max-width:820px){ :root{ --u:calc(100vw / 720); } }
 
-        /* Hero */
-        .hero { height: 100vh; display: flex; flex-direction: column; justify-content: center; position: relative; }
-        .hero h1 { font-size: clamp(4rem, 15vw, 16rem); line-height: 0.8; letter-spacing: -5px; }
-        .hero h1 span { display: inline-block; opacity: 0; transform: translateY(100%) rotate(10deg); }
-        .hero .subtitle { font-family: 'Archivo Black', sans-serif; color: var(--accent); font-size: 1rem; letter-spacing: 4px; margin-top: 2rem; opacity: 0; }
-        .hero-img { position: absolute; top: 15%; right: 5%; width: 300px; height: 450px; object-fit: cover; opacity: 0.3; z-index: -1; }
+*,*::before,*::after{ margin:0; padding:0; box-sizing:border-box; }
 
-        /* Editorial Spreads (Text + Image) */
-        .spread-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; max-width: 1400px; margin: 0 auto; }
-        .spread-grid.reverse { direction: rtl; }
-        .spread-grid.reverse > * { direction: ltr; }
-        @media (max-width: 768px) { .spread-grid, .spread-grid.reverse { grid-template-columns: 1fr; gap: 2rem; direction: ltr; } }
-        .spread-text h2 { font-size: clamp(2.5rem, 5vw, 5rem); margin-bottom: 2rem; }
-        .spread-text p { font-size: 1.1rem; max-width: 500px; color: var(--gray-text); }
-        body.light-mode .spread-text p { color: #444; }
+html{ -webkit-text-size-adjust:100%; }
 
-        /* Image Utilities */
-        .img-placeholder { background: #111; overflow: hidden; position: relative; border: 1px solid #222; }
-        body.light-mode .img-placeholder { background: #ddd; border: 1px solid #ccc; }
-        .img-placeholder img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; cursor: pointer; }
-        .img-placeholder:hover img { transform: scale(1.05); }
+body{
+  background:var(--pure-black);
+  color:var(--pure-white);
+  font-family:'Space Grotesk',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  font-weight:400;
+  line-height:1.6;
+  overflow-x:hidden;
+  transition:background-color .8s ease,color .8s ease;
+}
+body.light-mode{ background:var(--light-bg); color:var(--light-ink); }
 
-        /* Lightbox */
-        .lightbox {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 10001; cursor: pointer;
-            display: none; align-items: center; justify-content: center; padding: 4rem 2rem;
-            opacity: 0; transition: opacity 0.3s ease;
-        }
-        .lightbox.active { display: flex; opacity: 1; }
-        .lightbox img { max-width: 90vw; max-height: 85vh; object-fit: contain; box-shadow: 0 20px 60px rgba(0,0,0,0.6); }
-        .lightbox-close {
-            position: absolute; top: 2rem; right: 2rem; width: 48px; height: 48px;
-            border: 1px solid rgba(255,255,255,0.4); border-radius: 50%; background: transparent;
-            color: #fff; font-size: 1.6rem; line-height: 1; cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-            transition: background 0.3s, border-color 0.3s, transform 0.3s;
-        }
-        .lightbox-close:hover { background: var(--accent); border-color: var(--accent); transform: rotate(90deg); }
-        .img-label { position: absolute; bottom: 10px; left: 10px; font-size: 0.7rem; background: rgba(0,0,0,0.7); padding: 4px 8px; color: #fff; font-family: monospace; }
-        
-        /* Varying Grid Layouts */
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
-        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
-        .mosaic-layout { display: grid; grid-template-columns: 2fr 1fr 1fr; grid-template-rows: 200px 200px; gap: 1rem; }
-        .mosaic-layout .img-placeholder:nth-child(1) { grid-row: span 2; }
-        .offset-layout { display: flex; gap: 2rem; align-items: center; }
-        .offset-layout .col { flex: 1; }
-        .offset-layout .col:last-child { margin-top: 4rem; }
-        .horizontal-track { display: flex; gap: 2rem; overflow-x: auto; padding-bottom: 1rem; scroll-snap-type: x mandatory; }
-        .horizontal-track .img-placeholder { flex: 0 0 300px; height: 400px; scroll-snap-align: start; }
-        .horizontal-track::-webkit-scrollbar { height: 5px; }
-        .horizontal-track::-webkit-scrollbar-thumb { background: var(--accent); }
-        @media (max-width: 768px) { .grid-3, .grid-4, .mosaic-layout { grid-template-columns: 1fr 1fr; } .mosaic-layout { grid-template-rows: 150px 150px; } }
+h1,h2,h3,h4{ font-family:'Archivo Black',sans-serif; font-weight:400; line-height:.95; letter-spacing:-.02em; }
+p{ line-height:1.65; }
+a{ color:inherit; }
+img{ max-width:100%; display:block; }
+::selection{ background:var(--accent); color:#fff; }
 
-        /* Media & Links */
-        .media-card { border: 1px solid #333; padding: 2rem; margin-top: 2rem; background: rgba(255,255,255,0.02); max-width: 800px; }
-        .media-card h4 { color: var(--accent); margin-bottom: 1rem; font-family: 'Archivo Black', sans-serif; font-size: 0.9rem; }
-        .media-card iframe { width: 100%; aspect-ratio: 16/9; border: none; }
-        .media-card a { color: #fff; text-decoration: none; border-bottom: 1px solid var(--accent); }
-        body.light-mode .media-card { background: rgba(0,0,0,0.03); border-color: #ddd; }
-        body.light-mode .media-card a { color: #000; }
+.serif{ font-family:'Playfair Display',Georgia,serif; font-style:italic; letter-spacing:0; }
 
-        /* Education & Projects */
-        .timeline-item { border-left: 2px solid var(--accent); padding-left: 2rem; margin-bottom: 3rem; position: relative; }
-        .timeline-item::before { content: ''; position: absolute; left: -6px; top: 0; width: 10px; height: 10px; background: var(--accent); border-radius: 50%; }
-        .project-card { border: 1px solid #333; padding: 2rem; margin-bottom: 2rem; transition: transform 0.3s; }
-        .project-card:hover { transform: translateY(-5px); border-color: var(--accent); }
-        body.light-mode .project-card { border-color: #ccc; }
+/* ---- Accessibility helpers ------------------------------------------------ */
+.vh{
+  position:absolute!important; width:1px; height:1px; padding:0; margin:-1px;
+  overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0;
+}
+.skip-link{
+  position:fixed; top:.6rem; left:.6rem; z-index:10002;
+  background:var(--accent); color:#fff; padding:.7rem 1.1rem; border-radius:4px;
+  font-weight:600; text-decoration:none; transform:translateY(-160%);
+  transition:transform .25s var(--ease);
+}
+.skip-link:focus{ transform:translateY(0); }
 
-        /* Contact Form */
-        .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; max-width: 1200px; margin: 0 auto; }
-        @media (max-width: 768px) { .contact-grid { grid-template-columns: 1fr; } }
-        .form-group { margin-bottom: 1.5rem; }
-        .form-group label { display: block; margin-bottom: 0.5rem; font-family: 'Archivo Black', sans-serif; font-size: 0.8rem; text-transform: uppercase; }
-        .form-group input, .form-group textarea { width: 100%; padding: 1rem; background: transparent; border: 1px solid #555; color: inherit; font-family: 'Space Grotesk', sans-serif; }
-        body.light-mode .form-group input, body.light-mode .form-group textarea { border-color: #999; }
-        .submit-btn { background: var(--accent); color: #fff; border: none; padding: 1rem 2rem; font-family: 'Archivo Black', sans-serif; text-transform: uppercase; cursor: none; }
-        .contact-info p { margin-bottom: 1rem; display: flex; align-items: center; gap: 1rem; }
-        .contact-info a { color: inherit; text-decoration: none; border-bottom: 1px solid var(--accent); }
+:focus-visible{ outline:2px solid var(--accent); outline-offset:3px; border-radius:2px; }
 
-        /* Utility */
-        .reveal-up { opacity: 0; transform: translateY(40px); }
-        .text-center { text-align: center; }
-        .mb-4 { margin-bottom: 4rem; }
-        .max-w-800 { max-width: 800px; margin: 0 auto; }
-    </style>
+/* ---- Cursor ------------------------------------------------------------- */
+.cursor-dot{
+  position:fixed; top:0; left:0; width:9px; height:9px; border-radius:50%;
+  background:var(--accent); pointer-events:none; z-index:80;
+  transform:translate3d(-50%,-50%,0); mix-blend-mode:difference;
+  opacity:0; transition:opacity .3s ease, width .25s var(--ease), height .25s var(--ease);
+}
+.cursor-dot.on{ opacity:1; }
+.cursor-dot.wide{ width:44px; height:44px; background:transparent; border:1px solid var(--accent); }
+@media (hover:hover) and (pointer:fine){
+  html.js.fine-cursor body{ cursor:none; }
+  html.js.fine-cursor a,
+  html.js.fine-cursor button,
+  html.js.fine-cursor input,
+  html.js.fine-cursor textarea,
+  html.js.fine-cursor summary,
+  html.js.fine-cursor [tabindex]{ cursor:none; }
+}
+
+/* pointer-trail sparks */
+.spark{
+  position:fixed; top:0; left:0; width:5px; height:5px; border-radius:50%;
+  background:var(--accent-soft); pointer-events:none; z-index:79;
+  transform:translate3d(-50%,-50%,0); will-change:transform,opacity;
+}
+
+/* ---- Decorative fixed layers ----------------------------------------------- */
+#hero-gl{
+  position:fixed; inset:0; width:100%; height:100%;
+  z-index:0; pointer-events:none; display:block;
+  transition:opacity .4s linear;
+}
+#hero-gl.gone{ opacity:0!important; }
+
+#vignette{
+  position:fixed; inset:0; z-index:55; pointer-events:none;
+  background:radial-gradient(120% 90% at 50% 40%, transparent 40%, rgba(0,0,0,.55) 100%);
+  mix-blend-mode:multiply;
+}
+body.light-mode #vignette{ background:radial-gradient(130% 100% at 50% 40%, transparent 55%, rgba(120,110,95,.28) 100%); }
+
+#grain{
+  position:fixed; inset:-50%; width:200%; height:200%; z-index:60; pointer-events:none;
+  opacity:.05; mix-blend-mode:overlay; will-change:transform;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation:grain 7s steps(8) infinite;
+}
+@keyframes grain{
+  0%,100%{ transform:translate(0,0); } 20%{ transform:translate(-6%,3%); }
+  40%{ transform:translate(4%,-8%); } 60%{ transform:translate(-3%,6%); } 80%{ transform:translate(7%,2%); }
+}
+
+.progress-bar{
+  position:fixed; top:0; left:0; height:3px; width:0%;
+  background:var(--accent); z-index:10000; transform-origin:0 50%;
+}
+
+/* ---- Preloader --------------------------------------------------------- */
+#preloader{
+  position:fixed; inset:0; z-index:100; background:var(--pure-black);
+  display:flex; align-items:center; justify-content:center;
+  transition:opacity .6s ease, visibility .6s ease;
+}
+#preloader .pl-txt{
+  font-family:'Archivo Black',sans-serif; font-size:calc(22 * var(--u));
+  letter-spacing:-.03em; color:var(--pure-white); overflow:hidden;
+}
+#preloader .pl-txt span{ display:inline-block; transform:translateY(105%); animation:plrise .8s var(--ease-out) forwards; }
+@keyframes plrise{ to{ transform:translateY(0); } }
+#preloader.done{ opacity:0; visibility:hidden; }
+html:not(.js) #preloader{ display:none; }
+
+/* ---- Header / magnetic dock ------------------------------------------------ */
+.site-header{
+  position:fixed; top:0; left:0; width:100%; z-index:50;
+  display:flex; justify-content:center;
+  padding:calc(18 * var(--u)) var(--pad);
+  transition:transform .45s var(--ease), background-color .4s ease, backdrop-filter .4s ease;
+}
+.site-header.hidden{ transform:translateY(-140%); }
+.site-header.washed{ background:rgba(5,5,5,.72); backdrop-filter:blur(10px); }
+body.light-mode .site-header.washed{ background:rgba(244,241,234,.8); }
+
+.dock{
+  --mag:0;
+  list-style:none; display:flex; gap:calc(6 * var(--u)); align-items:center;
+  padding:calc(7 * var(--u)) calc(12 * var(--u));
+  border-radius:999px;
+  background:rgba(20,18,16,.5);
+  border:1px solid rgba(255,255,255,.08);
+  backdrop-filter:blur(14px);
+  position:relative;
+}
+body.light-mode .dock{ background:rgba(255,255,255,.55); border-color:rgba(0,0,0,.08); }
+
+/* specular rim — conic gradient masked to a 1px border, angle tracks pointer */
+.dock::after{
+  content:""; position:absolute; inset:0; border-radius:inherit; padding:1px;
+  background:conic-gradient(from calc(var(--spec-angle,90deg)), transparent 0deg,
+            rgba(255,255,255,.65) 40deg, transparent 90deg, transparent 360deg);
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor; mask-composite:exclude;
+  opacity:.6; pointer-events:none;
+}
+
+.dock a{
+  --d:0;
+  display:inline-flex; align-items:center; justify-content:center;
+  min-height:44px; padding:calc(6 * var(--u)) calc(13 * var(--u));
+  border-radius:999px;
+  font-size:calc(13 * var(--u)); font-weight:500; letter-spacing:.02em;
+  text-decoration:none; white-space:nowrap; color:var(--pure-white);
+  transform:scale(calc(1 + var(--d)));
+  transition:background-color .3s var(--ease), color .3s var(--ease);
+  transform-origin:center bottom;
+}
+body.light-mode .dock a{ color:var(--light-ink); }
+.dock a:hover,.dock a:focus-visible{ background:var(--accent); color:#fff; }
+@media (max-width:820px){
+  .site-header{ justify-content:flex-start; overflow-x:auto; scrollbar-width:none; }
+  .site-header::-webkit-scrollbar{ display:none; }
+  .dock{ gap:2px; padding:6px 8px; flex-wrap:nowrap; }
+  .dock a{ padding:10px 12px; font-size:12px; transform:none!important; }
+}
+
+/* ---- Sticky "open to roles" pill --------------------------------------- */
+.roles-pill{
+  position:fixed; bottom:1.4rem; left:50%; z-index:49;
+  transform:translate(-50%,180%);
+  display:flex; align-items:center; gap:.9rem;
+  background:var(--accent); color:#fff;
+  padding:.75rem 1rem .75rem 1.3rem; border-radius:999px;
+  font-size:.85rem; font-weight:600; box-shadow:0 12px 40px rgba(255,60,0,.35);
+  transition:transform .5s var(--ease);
+  max-width:calc(100vw - 2rem);
+}
+.roles-pill.show{ transform:translate(-50%,0); }
+.roles-pill a{ text-decoration:underline; text-underline-offset:3px; }
+.roles-pill button{
+  all:unset; width:26px; height:26px; display:grid; place-items:center;
+  border-radius:50%; background:rgba(255,255,255,.2); font-size:1rem; line-height:1;
+}
+.roles-pill button:hover{ background:rgba(255,255,255,.35); }
+
+/* ---- Chapter progress rail (desktop only) ---------------------------------- */
+.rail{
+  position:fixed; right:calc(20 * var(--u)); top:50%; transform:translateY(-50%);
+  z-index:45; display:flex; flex-direction:column; gap:12px; align-items:flex-end;
+}
+.rail button{
+  all:unset; cursor:pointer; display:flex; align-items:center; gap:10px;
+  font-size:10px; letter-spacing:.12em; text-transform:uppercase;
+  color:var(--gray-text);
+}
+.rail .tick{ display:block; width:22px; height:2px; background:currentColor; transition:width .35s var(--ease), background-color .35s ease; }
+.rail button[aria-current="true"]{ color:var(--accent); }
+.rail button[aria-current="true"] .tick{ width:46px; background:var(--accent); }
+.rail .lbl{ opacity:0; transform:translateX(6px); transition:opacity .3s ease, transform .3s ease; pointer-events:none; }
+.rail button:hover .lbl,
+.rail button:focus-visible .lbl{ opacity:1; transform:translateX(0); }
+body.light-mode .rail button{ color:#8a8478; }
+@media (max-width:1100px){ .rail{ display:none; } }
+
+/* ---- Entrance choreography (Sylva-style) --------------------------------- */
+html.js .fade{ opacity:0; transform:translateY(18px); }
+html.js .mask{ clip-path:inset(0 100% 0 0); }
+html.js .mask-circle{ clip-path:circle(0% at 50% 50%); }
+
+body.is-ready .fade{
+  opacity:1; transform:none;
+  transition:opacity 1.05s var(--ease) var(--d,0ms), transform 1.1s var(--ease-out) var(--d,0ms);
+}
+body.is-ready .mask{
+  clip-path:inset(0 0 0 0);
+  transition:clip-path 1.15s var(--ease-out) var(--d,0ms);
+}
+body.is-ready .mask-circle{
+  clip-path:circle(140% at 50% 50%);
+  transition:clip-path 1.3s var(--ease-out) var(--d,0ms);
+}
+body.intro-done .fade,
+body.intro-done .mask,
+body.intro-done .mask-circle{ clip-path:none!important; transition:none!important; }
+
+/* ---- HERO ------------------------------------------------------------- */
+.hero{
+  position:relative; z-index:2;
+  min-height:100svh;
+  display:flex; flex-direction:column; justify-content:center;
+  padding:calc(120 * var(--u)) var(--pad) calc(70 * var(--u));
+  overflow:hidden;
+}
+.hero-stage{
+  width:calc(1180 * var(--u));
+  max-width:100%;
+  margin-left:auto; margin-right:auto;   /* centre by margins, NOT transform */
+  position:relative;
+}
+.hero-eyebrow{
+  font-size:calc(13 * var(--u)); letter-spacing:.28em; text-transform:uppercase;
+  color:var(--accent); margin-bottom:calc(26 * var(--u));
+}
+.hero h1{
+  font-size:calc(120 * var(--u));
+  line-height:.8; letter-spacing:-.03em;
+  margin-bottom:calc(28 * var(--u));
+}
+.hero h1 .row{ display:block; overflow:hidden; }
+.hero h1 .ltr{
+  display:inline-block; will-change:transform;
+}
+html.js .hero h1 .ltr{ opacity:0; transform:translateY(110%) rotate(8deg); }
+body.is-ready .hero h1 .ltr{
+  opacity:1; transform:none;
+  transition:transform 1.25s var(--ease-out) var(--d), opacity 1.05s var(--ease) var(--d);
+}
+.hero-role{
+  font-family:'Archivo Black',sans-serif;
+  font-size:calc(15 * var(--u)); letter-spacing:.16em; text-transform:uppercase;
+  color:var(--pure-white); margin-bottom:calc(24 * var(--u));
+}
+body.light-mode .hero-role{ color:var(--light-ink); }
+.hero-tagline{
+  font-size:calc(18 * var(--u)); max-width:calc(620 * var(--u));
+  color:var(--gray-text); margin-bottom:calc(38 * var(--u));
+}
+body.light-mode .hero-tagline{ color:#4a453d; }
+
+/* manifest stat row */
+.manifest{
+  display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:calc(24 * var(--u));
+  margin-bottom:calc(40 * var(--u)); max-width:calc(940 * var(--u));
+}
+.manifest div{ border-top:1px solid var(--line); padding-top:calc(12 * var(--u)); }
+body.light-mode .manifest div{ border-color:rgba(0,0,0,.15); }
+.manifest dt{
+  font-family:'Archivo Black',sans-serif; font-size:calc(30 * var(--u));
+  color:var(--pure-white); letter-spacing:-.02em; line-height:1;
+}
+body.light-mode .manifest dt{ color:var(--light-ink); }
+.manifest dd{ font-size:calc(12 * var(--u)); color:var(--gray-text); margin-top:calc(8 * var(--u)); line-height:1.4; }
+@media (max-width:820px){ .manifest{ grid-template-columns:1fr 1fr; } }
+
+/* primary CTA */
+.cta{
+  display:inline-flex; align-items:center; gap:.8rem;
+  align-self:flex-start;
+  background:var(--accent); color:#fff; text-decoration:none;
+  font-family:'Archivo Black',sans-serif; text-transform:uppercase;
+  font-size:calc(13 * var(--u)); letter-spacing:.08em;
+  padding:calc(16 * var(--u)) calc(30 * var(--u)); border-radius:999px;
+  min-height:44px; position:relative; overflow:hidden;
+  transition:transform .4s var(--ease);
+}
+.cta span.sheen{
+  position:absolute; inset:0; background:linear-gradient(120deg,transparent 30%,rgba(255,255,255,.35) 50%,transparent 70%);
+  transform:translateX(-120%); transition:transform .7s var(--ease);
+}
+.cta:hover span.sheen{ transform:translateX(120%); }
+.cta .arw{ transition:transform .4s var(--ease); }
+.cta:hover .arw{ transform:translateX(5px); }
+
+.hero-portrait{
+  position:absolute; top:calc(20 * var(--u)); right:calc(-40 * var(--u));
+  width:calc(260 * var(--u)); aspect-ratio:3/4; object-fit:cover;
+  opacity:.16; filter:contrast(1.1); z-index:-1; border-radius:2px;
+}
+@media (max-width:820px){ .hero-portrait{ display:none; } .hero{ min-height:auto; padding-top:calc(150 * var(--u)); } }
+
+/* ---- Marquee divider -------------------------------------------------- */
+.marquee{
+  position:relative; z-index:2; overflow:hidden; white-space:nowrap;
+  border-top:1px solid var(--line); border-bottom:1px solid var(--line);
+  padding:1.1rem 0; background:var(--pure-black);
+}
+body.light-mode .marquee{ background:var(--light-bg); border-color:rgba(0,0,0,.14); }
+.marquee-track{ display:inline-flex; gap:2.5rem; padding-left:2.5rem; animation:scrollx 26s linear infinite; }
+.marquee span{ font-family:'Archivo Black',sans-serif; text-transform:uppercase; font-size:.95rem; letter-spacing:.05em; color:var(--gray-text); }
+.marquee span::after{ content:"·"; margin-left:2.5rem; color:var(--accent); }
+@keyframes scrollx{ to{ transform:translateX(-50%); } }
+
+/* ---- Sections ------------------------------------------------------------- */
+main{ position:relative; z-index:2; }
+section.chapter{
+  padding:clamp(5rem,11vw,9rem) var(--pad);
+  position:relative;
+}
+.wrap{ max-width:var(--maxw); margin:0 auto; }
+.eyebrow{
+  display:block; font-size:.8rem; letter-spacing:.22em; text-transform:uppercase;
+  color:var(--accent); margin-bottom:1.4rem; font-weight:600;
+}
+.eyebrow .mono{ font-family:'Space Grotesk',monospace; opacity:.7; }
+h2.chapter-h{
+  font-size:clamp(2.2rem,5.5vw,4.6rem);
+  margin-bottom:2rem; max-width:16ch;
+}
+/* word-by-word heading reveal */
+h2.chapter-h .w{ display:inline-block; overflow:hidden; vertical-align:top; }
+h2.chapter-h .w i{
+  display:inline-block; font-style:inherit;
+}
+html.js h2.chapter-h .w i{ transform:translateY(105%); opacity:0; }
+html.js h2.chapter-h.in .w i{
+  transform:none; opacity:1;
+  transition:transform .9s var(--ease-out) var(--wd,0ms), opacity .7s var(--ease) var(--wd,0ms);
+}
+.lede{ font-size:clamp(1.05rem,1.6vw,1.3rem); max-width:60ch; color:var(--gray-text); }
+body.light-mode .lede{ color:#4a453d; }
+.body-copy{ max-width:62ch; margin-top:1.2rem; color:var(--pure-white); }
+body.light-mode .body-copy{ color:#2a2620; }
+.body-copy + .body-copy{ margin-top:1rem; }
+
+/* generic reveal */
+html.js [data-rv]{ opacity:0; transform:translateY(28px); filter:blur(6px); }
+html.js [data-rv].in{
+  opacity:1; transform:none; filter:blur(0);
+  transition:opacity .8s var(--ease) var(--rvd,0ms), transform .9s var(--ease-out) var(--rvd,0ms), filter .8s var(--ease) var(--rvd,0ms);
+}
+
+/* light sections */
+section.light-section{ color:var(--light-ink); }
+
+.spread{
+  display:grid; grid-template-columns:1fr 1fr; gap:clamp(2rem,5vw,4.5rem); align-items:center;
+}
+.spread.rev > .spread-media{ order:-1; }
+@media (max-width:860px){ .spread{ grid-template-columns:1fr; } .spread.rev > .spread-media{ order:0; } }
+
+/* image blocks */
+.imgbox{
+  position:relative; overflow:hidden; background:#111; border:1px solid var(--line);
+}
+body.light-mode .imgbox{ background:#e4e0d6; border-color:rgba(0,0,0,.12); }
+.imgbox img{ width:100%; height:100%; object-fit:cover; transition:transform .6s var(--ease); }
+.imgbox:hover img{ transform:scale(1.04); }
+.imgbox img[role="button"]{ cursor:zoom-in; }
+.img-label{
+  position:absolute; left:8px; bottom:8px; font-family:'Space Grotesk',monospace;
+  font-size:.62rem; letter-spacing:.03em; background:rgba(0,0,0,.68); color:#fff;
+  padding:3px 7px; border-radius:2px; pointer-events:none;
+}
+.img-fallback{ display:flex; align-items:flex-end; }
+.img-fallback .img-label{ position:static; background:transparent; font-size:.72rem; padding:10px; }
+
+.grid-2{ display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+.grid-3{ display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; }
+.grid-4{ display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; }
+.mosaic{ display:grid; grid-template-columns:2fr 1fr 1fr; grid-auto-rows:210px; gap:1rem; }
+.mosaic .imgbox:first-child{ grid-row:span 2; }
+@media (max-width:860px){ .grid-3,.grid-4,.mosaic{ grid-template-columns:1fr 1fr; } .mosaic{ grid-auto-rows:150px; } }
+@media (max-width:520px){ .grid-4{ grid-template-columns:1fr 1fr; } }
+
+/* horizontal podium strip */
+.hstrip{
+  display:flex; gap:1.5rem; overflow-x:auto; padding-bottom:1rem;
+  scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch;
+}
+.hstrip .card{
+  flex:0 0 min(280px,80vw); scroll-snap-align:start;
+  border:1px solid var(--line); padding:1.6rem; border-radius:4px;
+  background:rgba(255,255,255,.02);
+}
+body.light-mode .hstrip .card{ background:rgba(0,0,0,.03); border-color:rgba(0,0,0,.12); }
+.hstrip .yr{ font-family:'Archivo Black',sans-serif; font-size:1.8rem; color:var(--accent); }
+.hstrip .card p{ margin-top:.6rem; font-size:.92rem; }
+.hstrip::-webkit-scrollbar{ height:4px; }
+.hstrip::-webkit-scrollbar-thumb{ background:var(--accent); }
+
+/* ID card / definition lists */
+.idcard{
+  border:1px solid var(--line); border-radius:4px; padding:1.6rem;
+  display:grid; grid-template-columns:auto 1fr; gap:.5rem 1.4rem; font-size:.95rem;
+  max-width:520px;
+}
+body.light-mode .idcard{ border-color:rgba(0,0,0,.14); }
+.idcard dt{ font-family:'Archivo Black',sans-serif; font-size:.7rem; text-transform:uppercase; letter-spacing:.08em; color:var(--accent); align-self:center; }
+.idcard dd{ color:var(--gray-text); }
+body.light-mode .idcard dd{ color:#4a453d; }
+
+.chips{ display:flex; flex-wrap:wrap; gap:.6rem; margin-top:1.4rem; }
+.chips li{ list-style:none; }
+.chips span,.chips li{
+  font-size:.78rem; letter-spacing:.03em; padding:.45rem .9rem; border-radius:999px;
+  border:1px solid var(--line); color:var(--gray-text);
+}
+body.light-mode .chips span,body.light-mode .chips li{ border-color:rgba(0,0,0,.16); color:#4a453d; }
+
+/* timeline */
+.timeline{ margin-top:2.4rem; }
+.tl-item{ border-left:2px solid var(--accent); padding:0 0 2rem 1.6rem; position:relative; }
+.tl-item::before{ content:""; position:absolute; left:-7px; top:2px; width:12px; height:12px; border-radius:50%; background:var(--accent); }
+.tl-item h3{ font-size:1.15rem; }
+.tl-item .meta{ color:var(--accent); font-size:.85rem; margin:.35rem 0; font-family:'Space Grotesk',monospace; }
+.tl-item p{ color:var(--gray-text); font-size:.95rem; }
+body.light-mode .tl-item p{ color:#4a453d; }
+
+/* referee quote */
+.referee{
+  margin-top:2.6rem; border-left:2px solid var(--line); padding-left:1.4rem;
+  font-family:'Playfair Display',serif; font-style:italic; font-size:1.15rem; color:var(--gray-text);
+  max-width:52ch;
+}
+.referee cite{ display:block; margin-top:.8rem; font-family:'Space Grotesk',sans-serif; font-style:normal; font-size:.8rem; letter-spacing:.05em; color:var(--accent); }
+
+/* media poster (click-to-load embeds) */
+.poster{
+  position:relative; border:1px solid var(--line); border-radius:4px; overflow:hidden;
+  max-width:760px; margin-top:2rem; aspect-ratio:16/9; background:#0d0b09;
+  display:flex; align-items:center; justify-content:center; text-align:center;
+}
+body.light-mode .poster{ border-color:rgba(0,0,0,.14); background:#e8e4da; }
+.poster .pbtn{
+  all:unset; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:.8rem;
+  padding:1.5rem; color:var(--pure-white);
+}
+body.light-mode .poster .pbtn{ color:var(--light-ink); }
+.poster .play{
+  width:60px; height:60px; border-radius:50%; border:1px solid var(--accent);
+  display:grid; place-items:center; color:var(--accent); font-size:1.2rem;
+  transition:background-color .3s var(--ease), color .3s var(--ease);
+}
+.poster .pbtn:hover .play{ background:var(--accent); color:#fff; }
+.poster .lbl{ font-size:.8rem; letter-spacing:.08em; text-transform:uppercase; max-width:36ch; }
+.poster iframe{ position:absolute; inset:0; width:100%; height:100%; border:0; }
+.link-row{ margin-top:1.4rem; display:flex; flex-wrap:wrap; gap:1rem; font-size:.9rem; }
+.link-row a{ border-bottom:1px solid var(--accent); text-decoration:none; padding-bottom:2px; }
+
+/* ---- Foreground-stage handoff ------------------------------------------- */
+#fg-sky{
+  position:fixed; inset:0; z-index:52; pointer-events:none;
+}
+#fg-sky .fg-cluster{
+  position:fixed; top:50%; transform:translateY(-50%);
+  /* left + width set inline from the home slot's box so text is never covered */
+}
+.fg-cluster .fg-child{ will-change:transform,opacity,filter; }
+#fg-sky .fg-cluster.parked{ opacity:0; }
+#fg-sky .fg-cluster.parked .fg-child{ opacity:0; }
+
+html.js .fg-cluster .fg-child{ opacity:0; transform:translate3d(0,6vh,0) scale(.98); filter:blur(14px); }
+html.js .fg-cluster.fg-active .fg-child{
+  opacity:1; transform:none; filter:blur(0);
+  transition:opacity .8s var(--ease) var(--fgd,0ms), transform .9s var(--ease-out) var(--fgd,0ms), filter .8s var(--ease) var(--fgd,0ms);
+}
+html.js .fg-cluster.fg-retiring .fg-child{
+  opacity:0; transform:translate3d(0,8vh,0) scale(.98); filter:blur(18px);
+  transition:opacity .7s var(--ease), transform .8s var(--ease-out), filter .7s var(--ease);
+}
+html.reduce-motion .fg-cluster.fg-retiring .fg-child{ filter:none; transform:translate3d(0,4vh,0); }
+
+/* placeholder in the flow where a cluster is lifted out */
+.fg-slot{ min-height:1px; }
+
+/* ---- Projects & case studies --------------------------------------------- */
+.proj{ border:1px solid var(--line); border-radius:6px; padding:2rem; margin-bottom:1.5rem; }
+body.light-mode .proj{ border-color:rgba(0,0,0,.14); }
+.proj .arc{ font-family:'Playfair Display',serif; font-style:italic; font-size:1.15rem; color:var(--pure-white); }
+body.light-mode .proj .arc{ color:var(--light-ink); }
+.proj .code{ font-family:'Space Grotesk',monospace; font-size:.78rem; letter-spacing:.12em; color:var(--accent); margin:1rem 0 .4rem; }
+.proj h3{ font-size:1.5rem; margin-bottom:.4rem; }
+.proj .when{ font-size:.85rem; color:var(--gray-text); font-family:'Space Grotesk',monospace; }
+.proj .desc{ margin:1rem 0; color:var(--gray-text); max-width:60ch; }
+body.light-mode .proj .desc{ color:#4a453d; }
+.proj .stats{ display:flex; gap:2.5rem; flex-wrap:wrap; margin:1rem 0; }
+.proj .stats div b{ font-family:'Archivo Black',sans-serif; font-size:1.6rem; display:block; color:var(--pure-white); }
+body.light-mode .proj .stats div b{ color:var(--light-ink); }
+.proj .stats div span{ font-size:.78rem; color:var(--gray-text); }
+.proj .tools{ font-size:.82rem; color:var(--gray-text); font-family:'Space Grotesk',monospace; }
+
+.cs-toggle{
+  all:unset; cursor:pointer; margin-top:1.2rem;
+  display:inline-flex; align-items:center; gap:.6rem;
+  font-family:'Archivo Black',sans-serif; font-size:.78rem; text-transform:uppercase; letter-spacing:.08em;
+  color:var(--accent); min-height:44px;
+}
+.cs-toggle .pm{ display:inline-grid; place-items:center; width:22px; height:22px; border:1px solid var(--accent); border-radius:50%; transition:transform .3s var(--ease); }
+.cs-toggle[aria-expanded="true"] .pm{ transform:rotate(45deg); }
+.cs-panel{ display:grid; grid-template-rows:0fr; transition:grid-template-rows .5s var(--ease); }
+.cs-panel > div{ overflow:hidden; }
+.cs-panel.open{ grid-template-rows:1fr; }
+.cs-body{ padding-top:1.6rem; display:grid; gap:1.3rem; }
+.cs-body h4{ font-size:.75rem; text-transform:uppercase; letter-spacing:.1em; color:var(--accent); margin-bottom:.4rem; }
+.cs-body p,.cs-body li{ font-size:.95rem; color:var(--gray-text); }
+body.light-mode .cs-body p,body.light-mode .cs-body li{ color:#4a453d; }
+.cs-body ul{ padding-left:1.1rem; display:grid; gap:.35rem; }
+.cs-body .rec{ font-family:'Playfair Display',serif; font-style:italic; color:var(--pure-white); font-size:1.05rem; }
+body.light-mode .cs-body .rec{ color:var(--light-ink); }
+
+/* ---- Recognition ---------------------------------------------------------- */
+.award{ border-top:1px solid var(--line); padding:1.8rem 0; }
+.award h3{ font-size:1.35rem; margin-bottom:.6rem; }
+.award p{ color:var(--gray-text); max-width:60ch; }
+body.light-mode .award{ border-color:rgba(0,0,0,.14); }
+body.light-mode .award p{ color:#4a453d; }
+
+/* ---- Contact form ------------------------------------------------------- */
+.contact-grid{ display:grid; grid-template-columns:1fr 1.1fr; gap:clamp(2rem,5vw,4rem); }
+@media (max-width:860px){ .contact-grid{ grid-template-columns:1fr; } }
+.contact-info p{ margin-bottom:.9rem; }
+.contact-info a{ text-decoration:none; border-bottom:1px solid var(--accent); padding-bottom:2px; }
+.field{ margin-bottom:1.3rem; }
+.field label{ display:block; font-family:'Archivo Black',sans-serif; font-size:.72rem; text-transform:uppercase; letter-spacing:.08em; margin-bottom:.5rem; }
+.field input,.field textarea{
+  width:100%; padding:.9rem 1rem; background:transparent; color:inherit;
+  border:1px solid var(--line); border-radius:4px; font:inherit;
+}
+body.light-mode .field input,body.light-mode .field textarea{ border-color:rgba(0,0,0,.28); }
+.field input:focus,.field textarea:focus{ border-color:var(--accent); outline:none; }
+fieldset.intent{ border:0; margin-bottom:1.3rem; }
+fieldset.intent legend{ font-family:'Archivo Black',sans-serif; font-size:.72rem; text-transform:uppercase; letter-spacing:.08em; margin-bottom:.7rem; }
+.intent-pills{ display:flex; flex-wrap:wrap; gap:.6rem; }
+.intent-pills label{
+  font-size:.82rem; padding:.5rem 1rem; border:1px solid var(--line); border-radius:999px;
+  cursor:pointer; min-height:44px; display:inline-flex; align-items:center;
+}
+body.light-mode .intent-pills label{ border-color:rgba(0,0,0,.24); }
+.intent-pills input{ position:absolute; opacity:0; width:0; height:0; }
+.intent-pills label:has(input:checked){ background:var(--accent); color:#fff; border-color:var(--accent); }
+.intent-pills label:has(input:focus-visible){ outline:2px solid var(--accent); outline-offset:2px; }
+.submit-btn{
+  all:unset; cursor:pointer; background:var(--accent); color:#fff;
+  font-family:'Archivo Black',sans-serif; text-transform:uppercase; font-size:.8rem; letter-spacing:.08em;
+  padding:1rem 2rem; border-radius:999px; min-height:44px; display:inline-flex; align-items:center; gap:.6rem;
+}
+.submit-btn[disabled]{ opacity:.6; cursor:progress; }
+
+/* toast */
+.toast{
+  position:fixed; left:50%; bottom:1.6rem; transform:translate(-50%,180%);
+  background:#111; color:#fff; border:1px solid var(--accent);
+  padding:1rem 1.4rem; border-radius:6px; z-index:10001; font-size:.9rem;
+  transition:transform .5s var(--ease); max-width:calc(100vw - 2rem);
+}
+.toast.show{ transform:translate(-50%,0); }
+
+/* ---- Footer ----------------------------------------------------------- */
+.foot{
+  position:relative; z-index:2; text-align:center; padding:4rem var(--pad);
+  border-top:1px solid var(--line); font-size:.82rem; color:var(--gray-text); letter-spacing:.05em;
+}
+body.light-mode .foot{ border-color:rgba(0,0,0,.14); }
+
+/* ---- Lightbox ------------------------------------------------------------- */
+.lightbox{
+  position:fixed; inset:0; z-index:10001; background:rgba(0,0,0,.93);
+  display:none; align-items:center; justify-content:center; padding:4rem 2rem;
+  opacity:0; transition:opacity .3s ease;
+}
+.lightbox.active{ display:flex; opacity:1; }
+.lightbox img{ max-width:92vw; max-height:86vh; object-fit:contain; box-shadow:0 24px 70px rgba(0,0,0,.6); }
+.lightbox .lb-close{
+  position:absolute; top:1.4rem; right:1.4rem; width:48px; height:48px; border-radius:50%;
+  border:1px solid rgba(255,255,255,.4); background:transparent; color:#fff; font-size:1.5rem;
+  display:grid; place-items:center; cursor:pointer;
+  transition:background-color .3s var(--ease), transform .3s var(--ease);
+}
+.lightbox .lb-close:hover{ background:var(--accent); border-color:var(--accent); transform:rotate(90deg); }
+
+/* ---- no-JS fallback ------------------------------------------------------- */
+html:not(.js) .rail,
+html:not(.js) .roles-pill,
+html:not(.js) #hero-gl,
+html:not(.js) .cursor-dot{ display:none; }
+
+/* ---- Reduced motion ----------------------------------------------------- */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{ animation-duration:.001ms!important; animation-iteration-count:1!important; transition-duration:.001ms!important; scroll-behavior:auto!important; }
+  .marquee-track{ animation:none; transform:none; }
+  #grain{ animation:none; }
+  html.js .fade,html.js .mask,html.js .mask-circle,
+  html.js [data-rv],html.js h2.chapter-h .w i,
+  html.js .hero h1 .ltr,html.js .fg-cluster .fg-child{
+    opacity:1!important; transform:none!important; filter:none!important; clip-path:none!important;
+  }
+}
+html.reduce-motion .marquee-track{ animation:none; }
+html.reduce-motion #grain{ animation:none; }
+</style>
 </head>
 <body>
 
-    <div class="grain"></div>
-    <div class="cursor-dot" id="cursorDot"></div>
-    <div class="progress-bar" id="progress"></div>
-    <a href="#contact" class="sticky-cta">Contact June</a>
+<a class="skip-link" href="#about">Skip to content</a>
 
-    <!-- HERO -->
-    <section class="hero">
-        <img src="images/me.jpg" class="hero-img" alt="June Nguyen" loading="lazy">
-        <h1 class="bold-type">
-            <span>J</span><span>U</span><span>N</span><span>E</span><br>
-            <span>N</span><span>G</span><span>U</span><span>Y</span><span>E</span><span>N</span>
-        </h1>
-        <div class="subtitle">IT · BUSINESS ANALYST</div>
-    </section>
+<!-- decorative layers (aria-hidden) -->
+<canvas id="hero-gl" aria-hidden="true"></canvas>
+<div id="vignette" aria-hidden="true"></div>
+<div id="grain" aria-hidden="true"></div>
+<div class="cursor-dot" id="cursorDot" aria-hidden="true"></div>
+<div class="progress-bar" id="progress" aria-hidden="true"></div>
+<div id="fg-sky" aria-hidden="true"></div>
 
-    <!-- ABOUT & EDUCATION -->
-    <section id="about">
-        <div class="spread-grid mb-4">
-            <div class="spread-text reveal-up">
-                <span class="chapter-num">00 · PROFILE</span>
-                <h2>Be the change,<br>make the change.</h2>
-                <p>I am June Nguyen, a Year-3 IT student at RMIT. Across the past six years, I have built a consistent record of leadership as a robotics mentor, club executive, AI project lead, and student ambassador, while maintaining a Top 1% GPA. This portfolio is the evidence of that journey.</p>
-            </div>
-            <div class="img-placeholder reveal-up" style="aspect-ratio: 3/4;">
-                <img src="images/about_me.jpg" alt="About June" loading="lazy">
-                <div class="img-label">images/about_me.jpg</div>
-            </div>
-        </div>
+<div id="preloader" aria-hidden="true">
+  <div class="pl-txt"><span>JUNE&nbsp;NGUYEN</span></div>
+</div>
 
-        <div class="reveal-up max-w-800">
-            <span class="chapter-num">EDUCATION</span>
-            <h2 style="font-size: 3rem; margin-bottom: 3rem;">Academic Foundation.</h2>
-            <div class="timeline-item">
-                <h3>Royal Melbourne Institute of Technology (RMIT)</h3>
-                <p style="color: var(--accent); margin: 0.5rem 0;">Expected May 2026 · GPA: 3.6 (Top 1%)</p>
-                <p>Bachelor of Information Technology. Major: Enterprise Systems Development.</p>
-            </div>
-            <div class="timeline-item">
-                <h3>Queensland University of Technology (QUT)</h3>
-                <p style="color: var(--accent); margin: 0.5rem 0;">Jul 2022 - Jun 2023</p>
-                <p>Bachelor of Engineering (Mechatronics). Australia.</p>
-            </div>
-        </div>
-    </section>
+<!-- HEADER / MAGNETIC DOCK -->
+<header class="site-header" id="siteHeader">
+  <nav aria-label="Primary">
+    <ul class="dock" id="dock">
+      <li><a href="#about">README</a></li>
+      <li><a href="#ch1-2018">robotics</a></li>
+      <li><a href="#ch3-2023">mentorship</a></li>
+      <li><a href="#ch4-network">rmit</a></li>
+      <li><a href="#ch5-genesis">work</a></li>
+      <li><a href="#projects">projects</a></li>
+      <li><a href="#contact">contact</a></li>
+    </ul>
+  </nav>
+</header>
 
-    <!-- CHAPTER 1: ROBOTICS -->
-    <section id="ch1-2018">
-        <span class="chapter-num reveal-up">01 · FOUNDATION OF EVERYTHING</span>
-        <div class="spread-grid mb-4">
-            <div class="spread-text reveal-up">
-                <h2>2018: Two 1st-prize finishes in one year.</h2>
-                <p>Robotacon is Vietnam’s premier educational robotics tournament. In 2018 I led my team to a first-place finish in the Ha Noi regional round, designing the robot’s mechanical structure. Later that year, I competed in IYRC Vietnam and won 1st prize again, this time as lead programmer for the autonomous line-trace routine. Two nationals, two 1st prizes, one same role.</p>
-            </div>
-            <div class="reveal-up">
-                <div class="grid-2">
-                    <div class="img-placeholder" style="aspect-ratio: 3/4;"><img src="images/2018 (1).jpg" loading="lazy"><div class="img-label">robotacon_2018_main1.jpg</div></div>
-                    <div class="img-placeholder" style="aspect-ratio: 3/4;"><img src="images/2018 (2).jpg" loading="lazy"><div class="img-label">iyrc_2018_main2.jpg</div></div>
-                </div>
-            </div>
-        </div>
-        <div class="grid-3 reveal-up" style="margin-top: 2rem;">
-            <div class="img-placeholder" style="aspect-ratio: 1/1;"><img src="images/355207177_816468936482955_620833200401094677_n.png" loading="lazy"><div class="img-label">2018_add1.jpg</div></div>
-            <div class="img-placeholder" style="aspect-ratio: 1/1;"><img src="images/Picture1.jpg" loading="lazy"><div class="img-label">2018_add3.jpg</div></div>
-            <div class="img-placeholder" style="aspect-ratio: 1/1;"><img src="images/z4494478225826_9091d3694fa85710cde372cbf0ff1b8c.jpg" loading="lazy"><div class="img-label">2018_add5.jpg</div></div>
-            <div class="img-placeholder" style="aspect-ratio: 1/1;"><img src="images/358583564_1652563545253361_3227352357123657327_n.jpg/" loading="lazy"><div class="img-label">2018_add6.jpg</div></div>
-        </div>
-        <div class="media-card reveal-up">
-            <h4>WATCH: Robotacon Ha Noi 2018 Interview</h4>
-            <iframe src="https://www.facebook.com/plugins/video.php?height=476&href=https%3A%2F%2Fwww.facebook.com%2FSaonamEdu%2Fvideos%2F802145796655794%2F&show_text=false&width=560" loading="lazy" allowfullscreen></iframe>
-        </div>
-    </section>
+<!-- CHAPTER PROGRESS RAIL (desktop) -->
+<nav class="rail" id="rail" aria-label="Chapter navigation"></nav>
 
-    <section id="ch1-2019">
-        <div class="spread-grid reverse mb-4">
-            <div class="spread-text reveal-up">
-                <h2>2019 / 2020: Representing Vietnam in Korea, twice.</h2>
-                <p>In 2019 I was selected for the Vietnam national team and travelled to Seoul to compete against representatives from over twenty countries. We earned the Excellent Award. I returned in 2020 and we improved, securing the Silver Prize (2nd), the second-highest honor awarded, under pandemic-era constraints.</p>
-            </div>
-            <div class="reveal-up">
-                <div class="grid-2">
-                    <div class="img-placeholder" style="aspect-ratio: 3/4;"><img src="images/d46bb8ca1363f73dae72.jpg" loading="lazy"><div class="img-label">korea_2019_main1.jpg</div></div>
-                    <div class="img-placeholder" style="aspect-ratio: 3/4;"><img src="images/Screenshot 2023-07-06 234706.png" loading="lazy"><div class="img-label">korea_2020_main2.jpg</div></div>
-                </div>
-            </div>
-        </div>
-        <div class="offset-layout reveal-up">
-            <div class="col grid-2">
-                <div class="img-placeholder" style="aspect-ratio: 1/1;"><img src="images/358617227_814630123384488_7653498537002005943_n.jpg" loading="lazy"><div class="img-label">korea_add1.jpg</div></div>
-            </div>
-            <div class="col grid-2">
-                <div class="img-placeholder" style="aspect-ratio: 1/1;"><img src="images/358360817_1014275769566637_968069441863076982_n.jpg" loading="lazy"><div class="img-label">korea_add3.jpg</div></div>
-            </div>
-        </div>
-    </section>
+<!-- STICKY OPEN-TO-ROLES PILL -->
+<div class="roles-pill" id="rolesPill" role="region" aria-label="Availability">
+  <span>Open to graduate &amp; early-career roles — <a href="#contact">Get in touch</a></span>
+  <button type="button" id="rolesDismiss" aria-label="Dismiss availability notice">&times;</button>
+</div>
 
-    <section id="ch1-timeline">
-        <span class="chapter-num reveal-up">CLOSING OUT THE HIGH-SCHOOL YEARS</span>
-        <h2 class="reveal-up mb-4" style="font-size: 4rem; text-align: center;">The Podium Record.</h2>
-        <div class="horizontal-track reveal-up">
-            <div class="img-placeholder"><img src="images/timeline_2017_3rd.jpg" loading="lazy"><div class="img-label">2017 3rd Prize Robotacon</div></div>
-            <div class="img-placeholder"><img src="images/timeline_2017_malaysia.jpg" loading="lazy"><div class="img-label">2017 IYRC Malaysia</div></div>
-            <div class="img-placeholder"><img src="images/timeline_2018_2nd.jpg" loading="lazy"><div class="img-label">2018 2nd Prize</div></div>
-            <div class="img-placeholder"><img src="images/timeline_2019_makex.jpg" loading="lazy"><div class="img-label">2019 MakeX Finalist</div></div>
-            <div class="img-placeholder"><img src="images/timeline_2020_techgenius.jpg" loading="lazy"><div class="img-label">2020 TechGenius Finalist</div></div>
-            <div class="img-placeholder"><img src="images/timeline_2021_avsc.jpg" loading="lazy"><div class="img-label">2021 AVSC Top 10</div></div>
-        </div>
-    </section>
+<!-- ======================= HERO ======================= -->
+<section class="hero" id="hero">
+  <div class="hero-stage">
+    <img class="hero-portrait par" src="images/me.jpg" alt="" width="520" height="693" data-pd="14" aria-hidden="true">
+    <p class="hero-eyebrow fade" style="--d:120ms">System Manifest — Portfolio 2026</p>
 
-    <!-- CHAPTER 2: AUSTRALIA (LIGHT MODE) -->
-    <section id="ch2-pivot" class="light-section">
-        <span class="chapter-num reveal-up">02 · A NEW BEGINNING</span>
-        <div class="spread-grid mb-4">
-            <div class="spread-text reveal-up">
-                <h2>2022: Six years of robotics, then a hard pivot.</h2>
-                <p>I finished high school. The original plan was to go to Australia to study Mechatronics. What I did not yet have was real exposure to how people outside the robotics bubble live. So I made a deliberate choice: spend a year in Australia doing handy jobs. Not for the money. The main reason was to put myself in other people’s shoes.</p>
-            </div>
-            <div class="img-placeholder reveal-up" style="aspect-ratio: 3/4;">
-                <img src="images/pivot_2022_main.jpg" loading="lazy">
-                <div class="img-label">pivot_2022_main.jpg</div>
-            </div>
-        </div>
-        
-        <div class="spread-grid reverse">
-            <div class="spread-text reveal-up">
-                <h3 style="font-size: 2.5rem; margin-bottom: 1rem;">Three handy jobs, one deliberate lesson.</h3>
-                <p>Car wash attendant, kitchen hand, dishwasher. Handy jobs put you face to face with customers in their most ordinary moments, and that is where you actually learn what people want and how it feels to be on the other side of the counter.</p>
-            </div>
-            <div class="img-placeholder reveal-up" style="aspect-ratio: 4/3;">
-                <img src="images/handy_jobs_1.jpg" loading="lazy">
-                <div class="img-label">handy_jobs_1.jpg</div>
-            </div>
-        </div>
-    </section>
+    <h1>
+      <span class="vh">June Nguyen</span>
+      <span class="row" aria-hidden="true" data-word="JUNE">JUNE</span>
+      <span class="row" aria-hidden="true" data-word="NGUYEN">NGUYEN</span>
+    </h1>
 
-    <section id="ch2-uniqlo" class="light-section">
-        <span class="chapter-num reveal-up">UNIQLO AUSTRALIA</span>
-        <h2 class="reveal-up mb-4" style="font-size: 4rem;">9 Months: The Only STEM Student on the Floor.</h2>
-        <div class="grid-4 reveal-up">
-            <div class="img-placeholder" style="aspect-ratio: 2/3;"><img src="images/uniqlo_1.jpg" loading="lazy"><div class="img-label">uniqlo_1.jpg</div></div>
-            <div class="img-placeholder" style="aspect-ratio: 2/3;"><img src="images/uniqlo_2.jpg" loading="lazy"><div class="img-label">uniqlo_2.jpg</div></div>
-            <div class="img-placeholder" style="aspect-ratio: 2/3;"><img src="images/uniqlo_3.jpg" loading="lazy"><div class="img-label">uniqlo_3.jpg</div></div>
-            <div class="img-placeholder" style="aspect-ratio: 2/3;"><img src="images/uniqlo_4.jpg" loading="lazy"><div class="img-label">uniqlo_4.jpg</div></div>
-            <div class="img-placeholder" style="aspect-ratio: 2/3;"><img src="images/uniqlo_5.jpg" loading="lazy"><div class="img-label">uniqlo_5.jpg</div></div>
-        </div>
-        <p class="reveal-up" style="margin-top: 2rem; max-width: 800px;">I learned how a job works as a small-scale society. My leader always encouraged me, cheered me up, and was always the first to take responsibility when the team made a mistake.</p>
-    </section>
+    <p class="hero-role fade" style="--d:900ms">IT · Business Analyst · Robotics &amp; AI Mentor</p>
+    <p class="hero-tagline fade" style="--d:1000ms">I turn messy, people-heavy problems into systems that run — combining enterprise software know-how, business analysis, six years of competitive robotics, and leadership built one team at a time.</p>
 
-    <!-- CHAPTER 3: EDISON (DARK MODE) -->
-    <section id="ch3-2023">
-        <span class="chapter-num reveal-up">03 · EDISON AN KHANH</span>
-        <div class="mosaic-layout reveal-up mb-4">
-            <div class="img-placeholder"><img src="images/edison_2023_main.jpg" loading="lazy"><div class="img-label">edison_2023_main.jpg</div></div>
-            <div class="img-placeholder"><img src="images/edison_2023_add1.jpg" loading="lazy"><div class="img-label">edison_2023_add1.jpg</div></div>
-            <div class="img-placeholder"><img src="images/edison_2023_add2.jpg" loading="lazy"><div class="img-label">edison_2023_add2.jpg</div></div>
-            <div class="img-placeholder"><img src="images/edison_2023_add3.jpg" loading="lazy"><div class="img-label">edison_2023_add3.jpg</div></div>
-            <div class="img-placeholder"><img src="images/edison_2023_add4.jpg" loading="lazy"><div class="img-label">edison_2023_add4.jpg</div></div>
-        </div>
-        <div class="spread-text max-w-800 reveal-up">
-            <h2 style="font-size: 3.5rem; margin-bottom: 1rem;">2023: A former teacher, a 2-week deadline.</h2>
-            <p>Invited by a former teacher who had moved to Edison An Khanh. Her new school was entering the VEX IQ Robotics Competition and they needed someone to check it out. That two-week sprint turned into three full seasons, twelve teams, and the most sustained leadership commitment of my life so far.</p>
-        </div>
-    </section>
+    <dl class="manifest fade" style="--d:1100ms" id="manifest">
+      <div><dt data-count="1" data-suffix="%" data-prefix="Top ">Top 1%</dt><dd>GPA across the RMIT SSET program</dd></div>
+      <div><dt data-count="12">12</dt><dd>VEX IQ teams mentored over three seasons</dd></div>
+      <div><dt data-count="9">9</dt><dd>national &amp; international robotics podium finishes</dd></div>
+      <div><dt data-count="200" data-suffix="+">200+</dt><dd>daily Scrum sync-ups coordinated at FPT IS</dd></div>
+    </dl>
 
-    <section id="ch3-2024">
-        <h2 class="reveal-up mb-4" style="font-size: 4rem;">2024: Four teams, six awards, one breakthrough season.</h2>
-        <div class="grid-2 reveal-up mb-4">
-            <div class="img-placeholder" style="aspect-ratio: 16/9;"><img src="images/edison_2024_main1.jpg" loading="lazy"><div class="img-label">edison_2024_main1.jpg</div></div>
-            <div class="img-placeholder" style="aspect-ratio: 16/9;"><img src="images/edison_2024_main2.jpg" loading="lazy"><div class="img-label">edison_2024_main2.jpg</div></div>
-        </div>
-        <div class="grid-4 reveal-up">
-            <div class="img-placeholder" style="aspect-ratio: 1/1;"><img src="images/edison_2024_add1.jpg" loading="lazy"><div class="img-label">edison_2024_add1.jpg</div></div>
-            <div class="img-placeholder" style="aspect-ratio: 1/1;"><img src="images/edison_2024_add2.jpg" loading="lazy"><div class="img-label">edison_2024_add2.jpg</div></div>
-            <div class="img-placeholder" style="aspect-ratio: 1/1;"><img src="images/edison_2024_add3.jpg" loading="lazy"><div class="img-label">edison_2024_add3.jpg</div></div>
-            <div class="img-placeholder" style="aspect-ratio: 1/1;"><img src="images/edison_2024_add4.jpg" loading="lazy"><div class="img-label">edison_2024_add4.jpg</div></div>
-            <div class="img-placeholder" style="aspect-ratio: 1/1;"><img src="images/edison_2024_add5.jpg" loading="lazy"><div class="img-label">edison_2024_add5.jpg</div></div>
-            <div class="img-placeholder" style="aspect-ratio: 1/1;"><img src="images/edison_2024_add6.jpg" loading="lazy"><div class="img-label">edison_2024_add6.jpg</div></div>
-            <div class="img-placeholder" style="aspect-ratio: 1/1;"><img src="images/edison_2024_add7.jpg" loading="lazy"><div class="img-label">edison_2024_add7.jpg</div></div>
-            <div class="img-placeholder" style="aspect-ratio: 1/1;"><img src="images/edison_2024_add8.jpg" loading="lazy"><div class="img-label">edison_2024_add8.jpg</div></div>
-        </div>
+    <a class="cta fade" style="--d:1250ms" href="#contact" data-magnetic>
+      <span class="sheen" aria-hidden="true"></span>
+      Open a pull request <span class="arw" aria-hidden="true">&rarr;</span>
+    </a>
+  </div>
+</section>
 
-        <h3 class="reveal-up" style="font-size: 3rem; margin-top: 4rem; margin-bottom: 2rem;">Mentor of the Year Award</h3>
-        <div class="grid-2 reveal-up">
-            <div class="img-placeholder" style="aspect-ratio: 4/3;"><img src="images/mentor_award_1.jpg" loading="lazy"><div class="img-label">mentor_award_1.jpg</div></div>
-            <div class="img-placeholder" style="aspect-ratio: 4/3;"><img src="images/mentor_award_2.jpg" loading="lazy"><div class="img-label">mentor_award_2.jpg</div></div>
-        </div>
-        <div class="media-card reveal-up">
-            <h4>READ: SSET Spotlight Article</h4>
-            <p><a href="https://www.facebook.com/rmit.sset/posts/sset-in-the-spotlight-it-software-engineering-students-journey-from-contestant-t/1213414177454677/" target="_blank">Read Article on Facebook</a></p>
-        </div>
-        <div class="media-card reveal-up">
-            <h4>WATCH: Mentor of the Year Video</h4>
-            <iframe src="https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7301129561566527489" loading="lazy" allowfullscreen></iframe>
-        </div>
-    </section>
+<div class="marquee" aria-hidden="true">
+  <div class="marquee-track" id="marquee">
+    <span>Ship it</span><span>Refactor the plan</span><span>Lead by merge</span><span>Evidence over adjectives</span><span>Calm under load</span><span>From contestant to mentor</span>
+    <span>Ship it</span><span>Refactor the plan</span><span>Lead by merge</span><span>Evidence over adjectives</span><span>Calm under load</span><span>From contestant to mentor</span>
+  </div>
+</div>
 
-    <section id="ch3-2025">
-        <div class="spread-grid mb-4">
-            <div class="spread-text reveal-up">
-                <h2>2025: New teams, deeper into programming.</h2>
-                <p>Continued with four completely new VEX IQ teams, shifting emphasis toward autonomous programming and team-spirit development. The season produced the program's first-ever Think Award, alongside two Spirit Awards.</p>
-            </div>
-            <div class="img-placeholder reveal-up" style="aspect-ratio: 4/5;">
-                <img src="images/edison_2025_main.jpg" loading="lazy">
-                <div class="img-label">edison_2025_main.jpg</div>
-            </div>
-        </div>
-        <div class="grid-4 reveal-up">
-            <div class="img-placeholder" style="aspect-ratio: 1/1;"><img src="images/edison_2025_add1.jpg" loading="lazy"><div class="img-label">add1.jpg</div></div>
-            <div class="img-placeholder" style="aspect-ratio: 1/1;"><img src="images/edison_2025_add2.jpg" loading="lazy"><div class="img-label">add2.jpg</div></div>
-            <div class="img-placeholder" style="aspect-ratio: 1/1;"><img src="images/edison_2025_add3.jpg" loading="lazy"><div class="img-label">add3.jpg</div></div>
-            <div class="img-placeholder" style="aspect-ratio: 1/1;"><img src="images/edison_2025_add4.jpg" loading="lazy"><div class="img-label">add4.jpg</div></div>
-            <div class="img-placeholder" style="aspect-ratio: 1/1;"><img src="images/edison_2025_add5.jpg" loading="lazy"><div class="img-label">add5.jpg</div></div>
-            <div class="img-placeholder" style="aspect-ratio: 1/1;"><img src="images/edison_2025_add6.jpg" loading="lazy"><div class="img-label">add6.jpg</div></div>
-            <div class="img-placeholder" style="aspect-ratio: 1/1;"><img src="images/edison_2025_add7.jpg" loading="lazy"><div class="img-label">add7.jpg</div></div>
-            <div class="img-placeholder" style="aspect-ratio: 1/1;"><img src="images/edison_2025_add8.jpg" loading="lazy"><div class="img-label">add8.jpg</div></div>
-        </div>
-    </section>
+<main>
 
-    <section id="ch3-ai">
-        <h2 class="reveal-up mb-4" style="font-size: 4rem;">2025-2026: From Robotics into AI Mentoring.</h2>
-        <div class="grid-2 reveal-up mb-4">
-            <div class="img-placeholder" style="aspect-ratio: 3/4;"><img src="images/ai_main1.jpg" loading="lazy"><div class="img-label">ai_main1.jpg</div></div>
-            <div class="img-placeholder" style="aspect-ratio: 3/4;"><img src="images/ai_main2.jpg" loading="lazy"><div class="img-label">ai_main2.jpg</div></div>
+<!-- ======================= 00 / README.md — ABOUT ======================= -->
+<!-- IMAGE CHECKLIST 00: about_me.jpg ✓ real -->
+<section class="chapter" id="about" data-rail="README" data-rail-full="00 / README.md">
+  <div class="wrap">
+    <span class="eyebrow"><span class="mono">00 / README.md</span> — About</span>
+    <div class="spread">
+      <div>
+        <h2 class="chapter-h" data-split>The common thread is turning goodwill into systems.</h2>
+        <p class="body-copy" data-rv>I'm a final-year IT student at RMIT Vietnam, majoring in Enterprise Systems Development and working as a Business Analyst. Over the past six years I've built a consistent record of leadership — robotics team captain, AI project mentor, club executive, student ambassador — while holding a GPA in the top 1% of my program. The common thread is turning operations that run on people and goodwill into systems that hold up without them.</p>
+        <p class="body-copy" data-rv>My background pulls from two directions that turn out to be one skill. Competitive robotics taught me to design, program and debug something that has to work on the day, in front of judges, with no second try. Business analysis taught me to do the same thing for software — find the real requirement under the stated one, make it visible, and prove it works before it ships. I'm most useful where those meet: a team that needs a plan, a plan that needs a system, and a system that needs someone to check it actually solves the problem.</p>
+        <p class="body-copy" data-rv>I'm looking for graduate and early-career roles in business analysis, enterprise systems, and technical project delivery — in Vietnam or remote.</p>
+        <ul class="chips" data-rv aria-label="Focus areas">
+          <li>Business Analysis</li><li>Enterprise Systems</li><li>Agile Delivery (Scrum)</li>
+          <li>QA &amp; UAT</li><li>Requirements Engineering</li><li>Technical Mentoring</li>
+        </ul>
+      </div>
+      <div class="spread-media">
+        <dl class="idcard" data-rv>
+          <dt>Name</dt><dd>June Nguyen (Nguyen Ngoc Dung)</dd>
+          <dt>Program</dt><dd>Bachelor of Information Technology, Major in Enterprise Systems Development</dd>
+          <dt>Institution</dt><dd>RMIT University Vietnam</dd>
+          <dt>Based in</dt><dd>Hanoi, Vietnam</dd>
+        </dl>
+        <div class="imgbox" data-rv style="aspect-ratio:3/4;margin-top:1rem">
+          <img src="images/about_me.jpg" alt="June Nguyen" width="900" height="1200" loading="lazy" data-lightbox>
+          <span class="img-label">images/about_me.jpg</span>
         </div>
-        <div class="grid-4 reveal-up">
-            <div class="img-placeholder" style="aspect-ratio: 1/1;"><img src="images/ai_add1.jpg" loading="lazy"><div class="img-label">ai_add1.jpg</div></div>
-            <div class="img-placeholder" style="aspect-ratio: 1/1;"><img src="images/ai_add2.jpg" loading="lazy"><div class="img-label">ai_add2.jpg</div></div>
-            <div class="img-placeholder" style="aspect-ratio: 1/1;"><img src="images/ai_add3.jpg" loading="lazy"><div class="img-label">ai_add3.jpg</div></div>
-            <div class="img-placeholder" style="aspect-ratio: 1/1;"><img src="images/ai_add4.jpg" loading="lazy"><div class="img-label">ai_add4.jpg</div></div>
-            <div class="img-placeholder" style="aspect-ratio: 1/1;"><img src="images/ai_add5.jpg" loading="lazy"><div class="img-label">ai_add5.jpg</div></div>
-            <div class="img-placeholder" style="aspect-ratio: 1/1;"><img src="images/ai_add6.jpg" loading="lazy"><div class="img-label">ai_add6.jpg</div></div>
-            <div class="img-placeholder" style="aspect-ratio: 1/1;"><img src="images/ai_add7.jpg" loading="lazy"><div class="img-label">ai_add7.jpg</div></div>
-            <div class="img-placeholder" style="aspect-ratio: 1/1;"><img src="images/ai_add8.jpg" loading="lazy"><div class="img-label">ai_add8.jpg</div></div>
-        </div>
-        <p class="reveal-up" style="margin-top: 2rem; max-width: 800px;">Mentored two student groups for Editech: an AI system for early autism detection (1st Prize) and an AI pipeline for filtering toxic online content (3rd Prize).</p>
-    </section>
+      </div>
+    </div>
 
-    <!-- CHAPTER 4: RMIT ECOSYSTEM (LIGHT MODE) -->
-    <section id="ch4-network" class="light-section">
-        <span class="chapter-num reveal-up">04 · THE RMIT ECOSYSTEM</span>
-        <div class="spread-grid mb-4">
-            <div class="spread-text reveal-up">
-                <h2>From nerdy to networked.</h2>
-                <p>In my first year at RMIT I made a deliberate decision to step out of my comfort zone. I joined the Student Ambassadors Team (SAT) and the Student Council. From just these two roles, I have enlarged my networking circle far beyond what I thought possible.</p>
-            </div>
-            <div class="img-placeholder reveal-up" style="aspect-ratio: 4/5;">
-                <img src="images/nerdy_main.jpg" loading="lazy">
-                <div class="img-label">nerdy_main.jpg</div>
-            </div>
+    <div style="margin-top:4rem;max-width:760px">
+      <span class="eyebrow">Education</span>
+      <h2 class="chapter-h" data-split style="font-size:clamp(1.8rem,3.5vw,3rem)">My degree moved me from writing code to specifying it.</h2>
+      <p class="body-copy" data-rv>Enterprise Systems Development is less about a language and more about the seams — where a sales channel meets a warehouse, where a requirement meets a test case — which is exactly the work I do now as a BA.</p>
+      <p class="body-copy" data-rv>I started in Mechatronics at QUT in Australia <mark>[TODO: dates]</mark> before transferring home to RMIT. The detour wasn't wasted: a year of hands-on jobs and a hardware degree gave me a feel for how a system behaves when the neat diagram meets a real user.</p>
+      <div class="timeline">
+        <div class="tl-item" data-rv>
+          <h3>RMIT University Vietnam</h3>
+          <p class="meta">Expected May 2026 · GPA 3.6 (Top 1% of SSET)</p>
+          <p>Bachelor of Information Technology, Major: Enterprise Systems Development.</p>
         </div>
-        <div class="grid-4 reveal-up">
-            <div class="img-placeholder" style="aspect-ratio: 1/1;"><img src="images/nerdy_add1.jpg" loading="lazy"><div class="img-label">nerdy_add1.jpg</div></div>
-            <div class="img-placeholder" style="aspect-ratio: 1/1;"><img src="images/nerdy_add2.jpg" loading="lazy"><div class="img-label">nerdy_add2.jpg</div></div>
-            <div class="img-placeholder" style="aspect-ratio: 1/1;"><img src="images/nerdy_add3.jpg" loading="lazy"><div class="img-label">nerdy_add3.jpg</div></div>
-            <div class="img-placeholder" style="aspect-ratio: 1/1;"><img src="images/nerdy_add4.jpg" loading="lazy"><div class="img-label">nerdy_add4.jpg</div></div>
-            <div class="img-placeholder" style="aspect-ratio: 1/1;"><img src="images/nerdy_add5.jpg" loading="lazy"><div class="img-label">nerdy_add5.jpg</div></div>
-            <div class="img-placeholder" style="aspect-ratio: 1/1;"><img src="images/nerdy_add6.jpg" loading="lazy"><div class="img-label">nerdy_add6.jpg</div></div>
-            <div class="img-placeholder" style="aspect-ratio: 1/1;"><img src="images/nerdy_add7.jpg" loading="lazy"><div class="img-label">nerdy_add7.jpg</div></div>
-            <div class="img-placeholder" style="aspect-ratio: 1/1;"><img src="images/nerdy_add8.jpg" loading="lazy"><div class="img-label">nerdy_add8.jpg</div></div>
+        <div class="tl-item" data-rv>
+          <h3>Queensland University of Technology</h3>
+          <p class="meta">Jul 2022 – Jun 2023 · Australia</p>
+          <p>Bachelor of Engineering (Mechatronics). Transferred to RMIT.</p>
         </div>
-    </section>
+      </div>
+      <blockquote class="referee" data-rv>
+        “[TODO: 1–2 sentences from an RMIT lecturer — analytical ability, ownership, ability to lead peers.]”
+        <cite>— [Name, Title, RMIT Vietnam]</cite>
+      </blockquote>
+    </div>
+  </div>
+</section>
 
-    <section id="ch4-clubs" class="light-section">
-        <div class="spread-grid reverse mb-4">
-            <div class="spread-text reveal-up">
-                <h2>Two clubs, two roles, one thread.</h2>
-                <p>Internal care at IEC (HR Executive Assistant), outward reach at BUFI (External Affairs). I want to consistently develop my ability to look after the people inside an organization while also connecting the organization to the world outside it.</p>
-            </div>
-            <div class="grid-2 reveal-up">
-                <div class="img-placeholder" style="aspect-ratio: 3/4;"><img src="images/clubs_main1.jpg" loading="lazy"><div class="img-label">clubs_main1.jpg</div></div>
-                <div class="img-placeholder" style="aspect-ratio: 3/4;"><img src="images/clubs_main2.jpg" loading="lazy"><div class="img-label">clubs_main2.jpg</div></div>
-            </div>
-        </div>
-        <div class="grid-4 reveal-up">
-            <div class="img-placeholder" style="aspect-ratio: 1/1;"><img src="images/clubs_add1.jpg" loading="lazy"><div class="img-label">clubs_add1.jpg</div></div>
-            <div class="img-placeholder" style="aspect-ratio: 1/1;"><img src="images/clubs_add2.jpg" loading="lazy"><div class="img-label">clubs_add2.jpg</div></div>
-            <div class="img-placeholder" style="aspect-ratio: 1/1;"><img src="images/clubs_add3.jpg" loading="lazy"><div class="img-label">clubs_add3.jpg</div></div>
-            <div class="img-placeholder" style="aspect-ratio: 1/1;"><img src="images/clubs_add4.jpg" loading="lazy"><div class="img-label">clubs_add4.jpg</div></div>
-            <div class="img-placeholder" style="aspect-ratio: 1/1;"><img src="images/clubs_add5.jpg" loading="lazy"><div class="img-label">clubs_add5.jpg</div></div>
-            <div class="img-placeholder" style="aspect-ratio: 1/1;"><img src="images/clubs_add6.jpg" loading="lazy"><div class="img-label">clubs_add6.jpg</div></div>
-            <div class="img-placeholder" style="aspect-ratio: 1/1;"><img src="images/clubs_add7.jpg" loading="lazy"><div class="img-label">clubs_add7.jpg</div></div>
-            <div class="img-placeholder" style="aspect-ratio: 1/1;"><img src="images/clubs_add8.jpg" loading="lazy"><div class="img-label">clubs_add8.jpg</div></div>
-        </div>
-    </section>
+<!-- ======================= 01 / init — FOUNDATION: ROBOTICS ======================= -->
+<!-- IMAGE CHECKLIST 01: 2018 (1).jpg ✓ · 2018 (2).jpg ✓ · 355207177_..._n.png ✓ · Picture1.jpg ✓ ·
+     z4494478225826_..._n.jpg ✓ · 358583564_..._n.jpg ✓ · d46bb8ca1363f73dae72.jpg ✓ ·
+     Screenshot 2023-07-06 234706.png ✓ · 358617227_..._n.jpg ✓ · 358360817_..._n.jpg ✓
+     NEEDS REAL FILES: timeline_2017_* strip images (podium strip is text-first, no blockers) -->
+<section class="chapter" id="ch1-2018" data-rail="robotics" data-rail-full="01 / init — Foundation: Robotics">
+  <div class="wrap">
+    <span class="eyebrow"><span class="mono">01 / init — first commit</span> — Foundation: Robotics</span>
+    <p class="lede" data-rv>Six years of competitive robotics, in the order they happened — not a trophy shelf, but where I learned to build under a deadline and lead a team that has to perform on cue.</p>
 
-    <section id="ch4-sset" class="light-section">
-        <div class="spread-grid mb-4">
-            <div class="spread-text reveal-up">
-                <h2>MAY 2025 TO PRESENT<br>ITSE Ambassador & Future Tech Camp Facilitator.</h2>
-                <p>Represented the IT and Software Engineering programs. Supported workshop sessions in Python, AI/ML fundamentals, Arduino robotics, and game development. Guided 3 student teams, all receiving top awards.</p>
-            </div>
-            <div class="img-placeholder reveal-up" style="aspect-ratio: 4/3;">
-                <img src="images/sset_main.jpg" loading="lazy">
-                <div class="img-label">sset_main.jpg</div>
-            </div>
+    <div class="spread" style="margin-top:3rem" data-fg="ch1-2018">
+      <div>
+        <h2 class="chapter-h" data-split>2018 — two national golds, the same job done twice.</h2>
+        <p class="body-copy" data-rv>Robotacon is Vietnam's premier educational robotics tournament. In 2018 I led my team to first place in the Hanoi regional round as the mechanical-design lead, then won first prize again at IYRC Vietnam later that year as lead programmer for the autonomous line-trace routine. Two nationals, two golds, the same job done twice — design the thing, then make it run itself.</p>
+      </div>
+      <div class="spread-media fg-slot">
+        <div class="fg-cluster" data-fg-cluster>
+          <div class="grid-2">
+            <div class="imgbox fg-child" style="aspect-ratio:3/4;--fgd:0ms"><img src="images/2018 (1).jpg" alt="Robotacon Hanoi 2018" width="800" height="1067" loading="lazy" data-lightbox><span class="img-label">robotacon_2018_main1.jpg</span></div>
+            <div class="imgbox fg-child" style="aspect-ratio:3/4;--fgd:90ms"><img src="images/2018 (2).jpg" alt="IYRC Vietnam 2018" width="800" height="1067" loading="lazy" data-lightbox><span class="img-label">iyrc_2018_main2.jpg</span></div>
+          </div>
         </div>
-        <div class="grid-3 reveal-up">
-            <div class="img-placeholder" style="aspect-ratio: 2/3;"><img src="images/sset_add1.jpg" loading="lazy"><div class="img-label">sset_add1.jpg</div></div>
-            <div class="img-placeholder" style="aspect-ratio: 2/3;"><img src="images/sset_add2.jpg" loading="lazy"><div class="img-label">sset_add2.jpg</div></div>
-            <div class="img-placeholder" style="aspect-ratio: 2/3;"><img src="images/sset_add3.jpg" loading="lazy"><div class="img-label">sset_add3.jpg</div></div>
-            <div class="img-placeholder" style="aspect-ratio: 2/3;"><img src="images/sset_add4.jpg" loading="lazy"><div class="img-label">sset_add4.jpg</div></div>
-            <div class="img-placeholder" style="aspect-ratio: 2/3;"><img src="images/sset_add5.jpg" loading="lazy"><div class="img-label">sset_add5.jpg</div></div>
-            <div class="img-placeholder" style="aspect-ratio: 2/3;"><img src="images/sset_add6.jpg" loading="lazy"><div class="img-label">sset_add6.jpg</div></div>
+      </div>
+    </div>
+
+    <div class="grid-4" style="margin-top:2rem">
+      <div class="imgbox" data-rv style="aspect-ratio:1/1"><img src="images/355207177_816468936482955_620833200401094677_n.png" alt="Robotics 2018" width="600" height="600" loading="lazy" data-lightbox><span class="img-label">2018_add1.jpg</span></div>
+      <div class="imgbox" data-rv style="aspect-ratio:1/1"><img src="images/Picture1.jpg" alt="Robotics 2018" width="600" height="600" loading="lazy" data-lightbox><span class="img-label">2018_add3.jpg</span></div>
+      <div class="imgbox" data-rv style="aspect-ratio:1/1"><img src="images/z4494478225826_9091d3694fa85710cde372cbf0ff1b8c.jpg" alt="Robotics 2018" width="600" height="600" loading="lazy" data-lightbox><span class="img-label">2018_add5.jpg</span></div>
+      <div class="imgbox" data-rv style="aspect-ratio:1/1"><img src="images/358583564_1652563545253361_3227352357123657327_n.jpg" alt="Robotics 2018" width="600" height="600" loading="lazy" data-lightbox><span class="img-label">2018_add6.jpg</span></div>
+    </div>
+
+    <div class="poster" data-rv data-embed="https://www.facebook.com/plugins/video.php?height=476&href=https%3A%2F%2Fwww.facebook.com%2FSaonamEdu%2Fvideos%2F802145796655794%2F&show_text=false&width=560">
+      <button class="pbtn" type="button">
+        <span class="play" aria-hidden="true">&#9654;</span>
+        <span class="lbl">Watch — Robotacon Hanoi 2018 interview (loads Facebook embed)</span>
+      </button>
+    </div>
+  </div>
+</section>
+
+<section class="chapter" id="ch1-2019">
+  <div class="wrap">
+    <div class="spread rev" data-fg="ch1-2019">
+      <div>
+        <h2 class="chapter-h" data-split>2019–2020 — representing Vietnam in Seoul, twice.</h2>
+        <p class="body-copy" data-rv>Selected for the Vietnam national team in 2019, I competed in Seoul against representatives from more than twenty countries and we took the Excellent Award. I went back in 2020 and we moved up — Silver Prize, second overall, the second-highest honour — under pandemic-era constraints that cut our build and travel time <mark>[TODO: confirm]</mark>.</p>
+      </div>
+      <div class="spread-media fg-slot">
+        <div class="fg-cluster" data-fg-cluster>
+          <div class="grid-2">
+            <div class="imgbox fg-child" style="aspect-ratio:3/4;--fgd:0ms"><img src="images/d46bb8ca1363f73dae72.jpg" alt="Seoul 2019" width="800" height="1067" loading="lazy" data-lightbox><span class="img-label">korea_2019_main1.jpg</span></div>
+            <div class="imgbox fg-child" style="aspect-ratio:3/4;--fgd:90ms"><img src="images/Screenshot 2023-07-06 234706.png" alt="Seoul 2020" width="800" height="1067" loading="lazy" data-lightbox><span class="img-label">korea_2020_main2.jpg</span></div>
+          </div>
         </div>
-    </section>
+      </div>
+    </div>
+    <div class="grid-2" style="margin-top:2rem">
+      <div class="imgbox" data-rv style="aspect-ratio:4/3"><img src="images/358617227_814630123384488_7653498537002005943_n.jpg" alt="Seoul team" width="800" height="600" loading="lazy" data-lightbox><span class="img-label">korea_add1.jpg</span></div>
+      <div class="imgbox" data-rv style="aspect-ratio:4/3"><img src="images/358360817_1014275769566637_968069441863076982_n.jpg" alt="Seoul team" width="800" height="600" loading="lazy" data-lightbox><span class="img-label">korea_add3.jpg</span></div>
+    </div>
+  </div>
+</section>
 
-    <section id="ch4-hackathon" class="light-section">
-        <h2 class="reveal-up mb-4" style="font-size: 4rem;">Building under pressure.</h2>
-        <div class="grid-2 reveal-up mb-4">
-            <div class="img-placeholder" style="aspect-ratio: 16/9;"><img src="images/hackathon_main1.jpg" loading="lazy"><div class="img-label">hackathon_main1.jpg</div></div>
-            <div class="img-placeholder" style="aspect-ratio: 16/9;"><img src="images/hackathon_main2.jpg" loading="lazy"><div class="img-label">hackathon_main2.jpg</div></div>
+<section class="chapter" id="ch1-timeline" data-rail="podium" data-rail-full="The podium record">
+  <div class="wrap">
+    <span class="eyebrow">The podium record</span>
+    <h2 class="chapter-h" data-split>From contestant, year by year.</h2>
+    <div class="hstrip" data-rv tabindex="0" aria-label="Robotics podium record 2017 to 2021">
+      <div class="card"><div class="yr">2017</div><p>3rd Prize, Robotacon · IYRC Malaysia representative.</p></div>
+      <div class="card"><div class="yr">2018</div><p>1st Prize Robotacon Hanoi · 1st Prize IYRC Vietnam.</p></div>
+      <div class="card"><div class="yr">2019</div><p>Vietnam national team, Seoul — Excellent Award · MakeX finalist.</p></div>
+      <div class="card"><div class="yr">2020</div><p>Seoul — Silver (2nd) · TechGenius finalist.</p></div>
+      <div class="card"><div class="yr">2021</div><p>AVSC Top 10.</p></div>
+    </div>
+    <p class="body-copy" data-rv style="margin-top:2rem">Everything after this — mentoring, BA work, running a floor of 200 volunteers — is the same loop: scope it, build it, test it before it counts.</p>
+  </div>
+</section>
+
+<!-- ======================= 02 / hard reset — THE PIVOT ======================= -->
+<!-- IMAGE CHECKLIST 02: NEEDS REAL FILES — pivot_2022_main, handy_jobs_1, uniqlo_1..5 (all show colour-block fallback) -->
+<section class="chapter light-section" id="ch2-pivot" data-rail="pivot" data-rail-full="02 / hard reset — The Pivot">
+  <div class="wrap">
+    <span class="eyebrow"><span class="mono">02 / hard reset</span> — The Pivot</span>
+    <div class="spread">
+      <div>
+        <h2 class="chapter-h" data-split>2022 — a deliberate year on the other side of the counter.</h2>
+        <p class="body-copy" data-rv>I finished high school with a plan to study Mechatronics in Australia. What I didn't have was much exposure to how people outside the robotics bubble actually live, so I made a choice: spend a year in Australia doing ordinary jobs. Not for the money — to stand on the other side of the counter.</p>
+      </div>
+      <div class="spread-media">
+        <div class="imgbox" data-rv style="aspect-ratio:3/4"><img src="images/pivot_2022_main.jpg" alt="Australia 2022" width="800" height="1067" loading="lazy" data-lightbox><span class="img-label">pivot_2022_main.jpg</span></div>
+      </div>
+    </div>
+    <div class="spread rev" style="margin-top:3rem">
+      <div>
+        <h3 style="font-size:1.6rem;font-family:'Archivo Black',sans-serif;margin-bottom:1rem">Car-wash attendant, kitchen hand, dishwasher.</h3>
+        <p class="body-copy" data-rv>Those jobs put you face to face with customers in their most ordinary moments, which is where you actually learn what people want and how it feels to be the one serving them.</p>
+      </div>
+      <div class="spread-media">
+        <div class="imgbox" data-rv style="aspect-ratio:4/3"><img src="images/handy_jobs_1.jpg" alt="Handy jobs" width="900" height="675" loading="lazy" data-lightbox><span class="img-label">handy_jobs_1.jpg</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="chapter light-section" id="ch2-uniqlo">
+  <div class="wrap">
+    <h2 class="chapter-h" data-split>UNIQLO Australia — a shop as a small society.</h2>
+    <p class="body-copy" data-rv style="max-width:62ch">I learned how a shop works as a small society — rosters, standards, the difference a floor leader makes. My manager cheered the team on and was first to take responsibility when we got something wrong. I've run teams that way ever since.</p>
+    <div class="grid-4" style="margin-top:1.5rem">
+      <div class="imgbox" data-rv style="aspect-ratio:2/3"><img src="images/uniqlo_1.jpg" alt="UNIQLO Australia" width="500" height="750" loading="lazy" data-lightbox><span class="img-label">uniqlo_1.jpg</span></div>
+      <div class="imgbox" data-rv style="aspect-ratio:2/3"><img src="images/uniqlo_2.jpg" alt="UNIQLO Australia" width="500" height="750" loading="lazy" data-lightbox><span class="img-label">uniqlo_2.jpg</span></div>
+      <div class="imgbox" data-rv style="aspect-ratio:2/3"><img src="images/uniqlo_3.jpg" alt="UNIQLO Australia" width="500" height="750" loading="lazy" data-lightbox><span class="img-label">uniqlo_3.jpg</span></div>
+      <div class="imgbox" data-rv style="aspect-ratio:2/3"><img src="images/uniqlo_4.jpg" alt="UNIQLO Australia" width="500" height="750" loading="lazy" data-lightbox><span class="img-label">uniqlo_4.jpg</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= 03 / long-running branch — MENTORSHIP ======================= -->
+<!-- IMAGE CHECKLIST 03: NEEDS REAL FILES — edison_2023_*, edison_2024_*, mentor_award_*, edison_2025_*, ai_* (colour-block fallback) -->
+<section class="chapter" id="ch3-2023" data-rail="mentorship" data-rail-full="03 / long-running branch — Mentorship">
+  <div class="wrap">
+    <span class="eyebrow"><span class="mono">03 / long-running branch</span> — Mentorship</span>
+    <p class="lede" data-rv>A former teacher asked me to “check out” a robotics competition for two weeks. That branch never got merged back — it's still running, three seasons and twelve teams later, and it's the most sustained commitment I've made.</p>
+    <div class="spread" style="margin-top:3rem" data-fg="ch3-2023">
+      <div>
+        <h2 class="chapter-h" data-split>2023 — a two-week favour that didn't end.</h2>
+        <p class="body-copy" data-rv>Invited by a former teacher who'd moved to Edison An Khanh, whose school was entering the VEX IQ Robotics Competition and needed someone to scope it. The two-week sprint turned into three full seasons: twelve teams, and a coaching role I still hold.</p>
+      </div>
+      <div class="spread-media fg-slot">
+        <div class="fg-cluster" data-fg-cluster>
+          <div class="mosaic">
+            <div class="imgbox fg-child" style="--fgd:0ms"><img src="images/edison_2023_main.jpg" alt="Edison An Khanh 2023" width="800" height="800" loading="lazy" data-lightbox><span class="img-label">edison_2023_main.jpg</span></div>
+            <div class="imgbox fg-child" style="--fgd:70ms"><img src="images/edison_2023_add1.jpg" alt="Edison 2023" width="400" height="400" loading="lazy" data-lightbox><span class="img-label">edison_2023_add1.jpg</span></div>
+            <div class="imgbox fg-child" style="--fgd:140ms"><img src="images/edison_2023_add2.jpg" alt="Edison 2023" width="400" height="400" loading="lazy" data-lightbox><span class="img-label">edison_2023_add2.jpg</span></div>
+            <div class="imgbox fg-child" style="--fgd:210ms"><img src="images/edison_2023_add3.jpg" alt="Edison 2023" width="400" height="400" loading="lazy" data-lightbox><span class="img-label">edison_2023_add3.jpg</span></div>
+            <div class="imgbox fg-child" style="--fgd:280ms"><img src="images/edison_2023_add4.jpg" alt="Edison 2023" width="400" height="400" loading="lazy" data-lightbox><span class="img-label">edison_2023_add4.jpg</span></div>
+          </div>
         </div>
-        <div class="grid-3 reveal-up">
-            <div class="img-placeholder" style="aspect-ratio: 1/1;"><img src="images/hackathon_game1.jpg" loading="lazy"><div class="img-label">hackathon_game1.jpg</div></div>
-            <div class="img-placeholder" style="aspect-ratio: 1/1;"><img src="images/hackathon_game2.jpg" loading="lazy"><div class="img-label">hackathon_game2.jpg</div></div>
-            <div class="img-placeholder" style="aspect-ratio: 1/1;"><img src="images/hackathon_game3.jpg" loading="lazy"><div class="img-label">hackathon_game3.jpg</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="chapter" id="ch3-2024">
+  <div class="wrap">
+    <h2 class="chapter-h" data-split>2024 — four teams, six awards, one breakthrough season.</h2>
+    <ul class="body-copy" data-rv style="max-width:62ch;padding-left:1.1rem;display:grid;gap:.5rem">
+      <li>Coached 4 VEX IQ teams through a full competitive season.</li>
+      <li>Delivered 6 competition awards across the four teams <mark>[TODO: name them]</mark>.</li>
+      <li>Won the program's Mentor of the Year award.</li>
+      <li>Featured in RMIT SSET's spotlight article <em>“From contestant to mentor”</em>, and a Mentor of the Year video on LinkedIn.</li>
+    </ul>
+    <div class="grid-2" style="margin-top:2rem" data-fg="ch3-2024">
+      <div class="fg-slot" style="grid-column:1/-1">
+        <div class="fg-cluster" data-fg-cluster>
+          <div class="grid-4">
+            <div class="imgbox fg-child" style="aspect-ratio:1/1;--fgd:0ms"><img src="images/edison_2024_add1.jpg" alt="Edison 2024" width="400" height="400" loading="lazy" data-lightbox><span class="img-label">edison_2024_add1.jpg</span></div>
+            <div class="imgbox fg-child" style="aspect-ratio:1/1;--fgd:60ms"><img src="images/edison_2024_add2.jpg" alt="Edison 2024" width="400" height="400" loading="lazy" data-lightbox><span class="img-label">edison_2024_add2.jpg</span></div>
+            <div class="imgbox fg-child" style="aspect-ratio:1/1;--fgd:120ms"><img src="images/edison_2024_add3.jpg" alt="Edison 2024" width="400" height="400" loading="lazy" data-lightbox><span class="img-label">edison_2024_add3.jpg</span></div>
+            <div class="imgbox fg-child" style="aspect-ratio:1/1;--fgd:180ms"><img src="images/edison_2024_add4.jpg" alt="Edison 2024" width="400" height="400" loading="lazy" data-lightbox><span class="img-label">edison_2024_add4.jpg</span></div>
+          </div>
         </div>
-        <p class="reveal-up" style="margin-top: 2rem; max-width: 800px;">Hackathons force you to build something working in 24 to 48 hours. Every hackathon has tightened my ability to lead a team through a problem that does not have a textbook answer.</p>
-    </section>
+      </div>
+    </div>
+    <h3 style="font-size:1.6rem;font-family:'Archivo Black',sans-serif;margin:3rem 0 1.5rem">Mentor of the Year</h3>
+    <div class="grid-2" data-rv>
+      <div class="imgbox" style="aspect-ratio:4/3"><img src="images/mentor_award_1.jpg" alt="Mentor of the Year award" width="800" height="600" loading="lazy" data-lightbox><span class="img-label">mentor_award_1.jpg</span></div>
+      <div class="imgbox" style="aspect-ratio:4/3"><img src="images/mentor_award_2.jpg" alt="Mentor of the Year award" width="800" height="600" loading="lazy" data-lightbox><span class="img-label">mentor_award_2.jpg</span></div>
+    </div>
+    <div class="link-row" data-rv>
+      <a href="https://www.facebook.com/rmit.sset/posts/sset-in-the-spotlight-it-software-engineering-students-journey-from-contestant-t/1213414177454677/" target="_blank" rel="noopener">Read — “From contestant to mentor” (RMIT SSET)</a>
+    </div>
+    <div class="poster" data-rv data-embed="https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7301129561566527489">
+      <button class="pbtn" type="button">
+        <span class="play" aria-hidden="true">&#9654;</span>
+        <span class="lbl">Watch — Mentor of the Year video (loads LinkedIn embed)</span>
+      </button>
+    </div>
+  </div>
+</section>
 
-    <section id="ch4-tapxanh" class="light-section">
-        <span class="chapter-num reveal-up">JUNE 2025 · GLOBAL LEADERSHIP EXPERIENCE</span>
-        <h2 class="reveal-up mb-4" style="font-size: 4rem;">TapXanh: greening public transport.</h2>
-        <div class="grid-4 reveal-up">
-            <div class="img-placeholder" style="aspect-ratio: 3/4;"><img src="images/tapxanh_1.jpg" loading="lazy"><div class="img-label">tapxanh_1.jpg</div></div>
-            <div class="img-placeholder" style="aspect-ratio: 3/4;"><img src="images/tapxanh_2.jpg" loading="lazy"><div class="img-label">tapxanh_2.jpg</div></div>
-            <div class="img-placeholder" style="aspect-ratio: 3/4;"><img src="images/tapxanh_3.jpg" loading="lazy"><div class="img-label">tapxanh_3.jpg</div></div>
-            <div class="img-placeholder" style="aspect-ratio: 3/4;"><img src="images/tapxanh_4.jpg" loading="lazy"><div class="img-label">tapxanh_4.jpg</div></div>
+<section class="chapter" id="ch3-2025">
+  <div class="wrap">
+    <div class="spread" data-fg="ch3-2025">
+      <div>
+        <h2 class="chapter-h" data-split>2025 — new teams, deeper into code.</h2>
+        <ul class="body-copy" data-rv style="max-width:62ch;padding-left:1.1rem;display:grid;gap:.5rem">
+          <li>Took on 4 completely new VEX IQ teams, shifting emphasis to autonomous programming and team-spirit development.</li>
+          <li>The season produced the program's first-ever Think Award, plus two Spirit Awards.</li>
+        </ul>
+      </div>
+      <div class="spread-media fg-slot">
+        <div class="fg-cluster" data-fg-cluster>
+          <div class="grid-2">
+            <div class="imgbox fg-child" style="aspect-ratio:1/1;--fgd:0ms"><img src="images/edison_2025_add1.jpg" alt="Edison 2025" width="400" height="400" loading="lazy" data-lightbox><span class="img-label">edison_2025_add1.jpg</span></div>
+            <div class="imgbox fg-child" style="aspect-ratio:1/1;--fgd:80ms"><img src="images/edison_2025_add2.jpg" alt="Edison 2025" width="400" height="400" loading="lazy" data-lightbox><span class="img-label">edison_2025_add2.jpg</span></div>
+            <div class="imgbox fg-child" style="aspect-ratio:1/1;--fgd:160ms"><img src="images/edison_2025_add3.jpg" alt="Edison 2025" width="400" height="400" loading="lazy" data-lightbox><span class="img-label">edison_2025_add3.jpg</span></div>
+            <div class="imgbox fg-child" style="aspect-ratio:1/1;--fgd:240ms"><img src="images/edison_2025_add4.jpg" alt="Edison 2025" width="400" height="400" loading="lazy" data-lightbox><span class="img-label">edison_2025_add4.jpg</span></div>
+          </div>
         </div>
-        <p class="reveal-up" style="margin-top: 2rem; max-width: 800px;">Led the design of an incentive-based public transport solution. Developed a 5-year strategic plan with 80% government funding and 20% private equity. Delivered a 4-minute pitch that received strong validation for clarity and local relevance.</p>
-    </section>
+      </div>
+    </div>
+  </div>
+</section>
 
-    <section id="ch4-pitch" class="light-section">
-        <h2 class="reveal-up mb-4" style="font-size: 4rem;">Perfect Pitch: First tryout, deliberate exposure.</h2>
-        <div class="grid-2 reveal-up mb-4">
-            <div class="img-placeholder" style="aspect-ratio: 16/9;"><img src="images/pp2025_main1.jpg" loading="lazy"><div class="img-label">pp2025_main1.jpg</div></div>
-            <div class="img-placeholder" style="aspect-ratio: 16/9;"><img src="images/pp2025_main2.jpg" loading="lazy"><div class="img-label">pp2025_main2.jpg</div></div>
+<section class="chapter" id="ch3-ai">
+  <div class="wrap">
+    <h2 class="chapter-h" data-split>2025–2026 — from robotics into AI mentoring.</h2>
+    <p class="body-copy" data-rv>I mentored two student groups for Editech: an AI system for early autism detection, which took 1st Prize, and an AI pipeline for filtering toxic online content, which took 3rd Prize. Same mentoring loop as robotics — help them scope the problem, pick a method they can defend, and show it works — applied to models instead of motors.</p>
+    <div class="grid-4" style="margin-top:2rem" data-fg="ch3-ai">
+      <div class="fg-slot" style="grid-column:1/-1">
+        <div class="fg-cluster" data-fg-cluster>
+          <div class="grid-4">
+            <div class="imgbox fg-child" style="aspect-ratio:1/1;--fgd:0ms"><img src="images/ai_add1.jpg" alt="AI mentoring" width="400" height="400" loading="lazy" data-lightbox><span class="img-label">ai_add1.jpg</span></div>
+            <div class="imgbox fg-child" style="aspect-ratio:1/1;--fgd:60ms"><img src="images/ai_add2.jpg" alt="AI mentoring" width="400" height="400" loading="lazy" data-lightbox><span class="img-label">ai_add2.jpg</span></div>
+            <div class="imgbox fg-child" style="aspect-ratio:1/1;--fgd:120ms"><img src="images/ai_add3.jpg" alt="AI mentoring" width="400" height="400" loading="lazy" data-lightbox><span class="img-label">ai_add3.jpg</span></div>
+            <div class="imgbox fg-child" style="aspect-ratio:1/1;--fgd:180ms"><img src="images/ai_add4.jpg" alt="AI mentoring" width="400" height="400" loading="lazy" data-lightbox><span class="img-label">ai_add4.jpg</span></div>
+          </div>
         </div>
-        <div class="img-placeholder reveal-up mb-4" style="aspect-ratio: 21/9;">
-            <img src="images/pp2025_add1.jpg" loading="lazy"><div class="img-label">pp2025_add1.jpg</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= 04 / merge — THE RMIT ECOSYSTEM ======================= -->
+<!-- IMAGE CHECKLIST 04: NEEDS REAL FILES — nerdy_*, clubs_*, sset_*, hackathon_*, tapxanh_1..4, pp2025_*, pp2026_* -->
+<section class="chapter light-section" id="ch4-network" data-rail="rmit" data-rail-full="04 / merge — The RMIT Ecosystem">
+  <div class="wrap">
+    <span class="eyebrow"><span class="mono">04 / merge</span> — The RMIT Ecosystem</span>
+    <p class="lede" data-rv>In first year I decided to step out of the comfort zone deliberately. Two roles — Student Ambassadors Team and Student Council — pulled my network wider than I thought it could go.</p>
+    <div class="spread" style="margin-top:3rem" data-fg="ch4-network">
+      <div>
+        <h2 class="chapter-h" data-split>Most opportunities arrive through a person, not a posting.</h2>
+        <p class="body-copy" data-rv>I joined the Student Ambassadors Team (SAT) and the Student Council. From just those two, my circle grew past anything I'd planned for — and I learned that most opportunities arrive through a person, not a posting.</p>
+      </div>
+      <div class="spread-media fg-slot">
+        <div class="fg-cluster" data-fg-cluster>
+          <div class="grid-2">
+            <div class="imgbox fg-child" style="aspect-ratio:1/1;--fgd:0ms"><img src="images/nerdy_add1.jpg" alt="RMIT ecosystem" width="400" height="400" loading="lazy" data-lightbox><span class="img-label">nerdy_add1.jpg</span></div>
+            <div class="imgbox fg-child" style="aspect-ratio:1/1;--fgd:80ms"><img src="images/nerdy_add2.jpg" alt="RMIT ecosystem" width="400" height="400" loading="lazy" data-lightbox><span class="img-label">nerdy_add2.jpg</span></div>
+            <div class="imgbox fg-child" style="aspect-ratio:1/1;--fgd:160ms"><img src="images/nerdy_add3.jpg" alt="RMIT ecosystem" width="400" height="400" loading="lazy" data-lightbox><span class="img-label">nerdy_add3.jpg</span></div>
+            <div class="imgbox fg-child" style="aspect-ratio:1/1;--fgd:240ms"><img src="images/nerdy_add4.jpg" alt="RMIT ecosystem" width="400" height="400" loading="lazy" data-lightbox><span class="img-label">nerdy_add4.jpg</span></div>
+          </div>
         </div>
-        
-        <h3 class="reveal-up" style="font-size: 3rem; margin-top: 3rem; margin-bottom: 2rem;">2026: Returning, sharper.</h3>
-        <div class="grid-2 reveal-up mb-4">
-            <div class="img-placeholder" style="aspect-ratio: 16/9;"><img src="images/pp2026_main1.jpg" loading="lazy"><div class="img-label">pp2026_main1.jpg</div></div>
-            <div class="img-placeholder" style="aspect-ratio: 16/9;"><img src="images/pp2026_main2.jpg" loading="lazy"><div class="img-label">pp2026_main2.jpg</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="chapter light-section" id="ch4-clubs">
+  <div class="wrap">
+    <div class="spread rev">
+      <div>
+        <h2 class="chapter-h" data-split>Two clubs, two roles, one thread.</h2>
+        <p class="body-copy" data-rv>HR Executive Assistant at IEC — looking after the people inside the organisation. External Affairs at BUFI — connecting the organisation to the world outside it. I want to keep getting better at both halves at once.</p>
+      </div>
+      <div class="spread-media">
+        <div class="grid-2" data-rv>
+          <div class="imgbox" style="aspect-ratio:3/4"><img src="images/clubs_main1.jpg" alt="IEC" width="600" height="800" loading="lazy" data-lightbox><span class="img-label">clubs_main1.jpg</span></div>
+          <div class="imgbox" style="aspect-ratio:3/4"><img src="images/clubs_main2.jpg" alt="BUFI" width="600" height="800" loading="lazy" data-lightbox><span class="img-label">clubs_main2.jpg</span></div>
         </div>
-        <div class="grid-3 reveal-up">
-            <div class="img-placeholder" style="aspect-ratio: 1/1;"><img src="images/pp2026_add1.jpg" loading="lazy"><div class="img-label">pp2026_add1.jpg</div></div>
-            <div class="img-placeholder" style="aspect-ratio: 1/1;"><img src="images/pp2026_add2.jpg" loading="lazy"><div class="img-label">pp2026_add2.jpg</div></div>
-            <div class="img-placeholder" style="aspect-ratio: 1/1;"><img src="images/pp2026_add3.jpg" loading="lazy"><div class="img-label">pp2026_add3.jpg</div></div>
-            <div class="img-placeholder" style="aspect-ratio: 1/1;"><img src="images/pp2026_add4.jpg" loading="lazy"><div class="img-label">pp2026_add4.jpg</div></div>
-            <div class="img-placeholder" style="aspect-ratio: 1/1;"><img src="images/pp2026_add5.jpg" loading="lazy"><div class="img-label">pp2026_add5.jpg</div></div>
-            <div class="img-placeholder" style="aspect-ratio: 1/1;"><img src="images/pp2026_add6.jpg" loading="lazy"><div class="img-label">pp2026_add6.jpg</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="chapter light-section" id="ch4-sset">
+  <div class="wrap">
+    <div class="spread">
+      <div>
+        <h2 class="chapter-h" data-split>ITSE Ambassador &amp; Future Tech Camp Facilitator.</h2>
+        <p class="meta" style="color:var(--accent);font-family:'Space Grotesk',monospace;font-size:.85rem;margin-bottom:1rem">May 2025 to present</p>
+        <ul class="body-copy" data-rv style="max-width:62ch;padding-left:1.1rem;display:grid;gap:.5rem">
+          <li>Represented the IT &amp; Software Engineering programs to prospective students and families.</li>
+          <li>Supported workshop sessions in Python, AI/ML fundamentals, Arduino robotics, and game development.</li>
+          <li>Guided 3 student teams — all 3 took top awards <mark>[TODO: which event]</mark>.</li>
+        </ul>
+      </div>
+      <div class="spread-media">
+        <div class="imgbox" data-rv style="aspect-ratio:4/3"><img src="images/sset_main.jpg" alt="Future Tech Camp" width="900" height="675" loading="lazy" data-lightbox><span class="img-label">sset_main.jpg</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="chapter light-section" id="ch4-hackathon">
+  <div class="wrap">
+    <h2 class="chapter-h" data-split>Building under pressure — hackathons.</h2>
+    <p class="body-copy" data-rv>Hackathons force a working build in 24 to 48 hours. Each one has tightened my ability to lead a team through a problem with no textbook answer — decide fast, cut scope honestly, ship something that runs.</p>
+    <div class="grid-3" style="margin-top:2rem" data-rv>
+      <div class="imgbox" style="aspect-ratio:1/1"><img src="images/hackathon_game1.jpg" alt="Hackathon" width="500" height="500" loading="lazy" data-lightbox><span class="img-label">hackathon_game1.jpg</span></div>
+      <div class="imgbox" style="aspect-ratio:1/1"><img src="images/hackathon_game2.jpg" alt="Hackathon" width="500" height="500" loading="lazy" data-lightbox><span class="img-label">hackathon_game2.jpg</span></div>
+      <div class="imgbox" style="aspect-ratio:1/1"><img src="images/hackathon_game3.jpg" alt="Hackathon" width="500" height="500" loading="lazy" data-lightbox><span class="img-label">hackathon_game3.jpg</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="chapter light-section" id="ch4-tapxanh" data-rail="tapxanh" data-rail-full="Global Leadership Experience">
+  <div class="wrap">
+    <span class="eyebrow">June 2025 · Global Leadership Experience</span>
+    <h2 class="chapter-h" data-split>TapXanh — a policy problem turned into a funded plan.</h2>
+    <p class="body-copy" data-rv>Led the design of an incentive-based public-transport solution: a 5-year strategic plan funded 80% government / 20% private equity, delivered as a 4-minute pitch that scored strongly for clarity and local relevance.</p>
+    <div class="grid-4" style="margin-top:2rem" data-rv>
+      <div class="imgbox" style="aspect-ratio:3/4"><img src="images/tapxanh_1.jpg" alt="TapXanh" width="500" height="667" loading="lazy" data-lightbox><span class="img-label">tapxanh_1.jpg</span></div>
+      <div class="imgbox" style="aspect-ratio:3/4"><img src="images/tapxanh_2.jpg" alt="TapXanh" width="500" height="667" loading="lazy" data-lightbox><span class="img-label">tapxanh_2.jpg</span></div>
+      <div class="imgbox" style="aspect-ratio:3/4"><img src="images/tapxanh_3.jpg" alt="TapXanh" width="500" height="667" loading="lazy" data-lightbox><span class="img-label">tapxanh_3.jpg</span></div>
+      <div class="imgbox" style="aspect-ratio:3/4"><img src="images/tapxanh_4.jpg" alt="TapXanh" width="500" height="667" loading="lazy" data-lightbox><span class="img-label">tapxanh_4.jpg</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="chapter light-section" id="ch4-pitch">
+  <div class="wrap">
+    <h2 class="chapter-h" data-split>Perfect Pitch — 2025 for exposure, 2026 sharper.</h2>
+    <p class="body-copy" data-rv>First tryout in 2025 was deliberate exposure — get on the stage, learn the format. I came back in 2026 sharper <mark>[TODO: result / placement]</mark>.</p>
+    <div class="grid-2" style="margin-top:2rem" data-rv>
+      <div class="imgbox" style="aspect-ratio:16/9"><img src="images/pp2025_main1.jpg" alt="Perfect Pitch 2025" width="960" height="540" loading="lazy" data-lightbox><span class="img-label">pp2025_main1.jpg</span></div>
+      <div class="imgbox" style="aspect-ratio:16/9"><img src="images/pp2026_main1.jpg" alt="Perfect Pitch 2026" width="960" height="540" loading="lazy" data-lightbox><span class="img-label">pp2026_main1.jpg</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= 05 / deploy to production — PROFESSIONAL PATH ======================= -->
+<!-- IMAGE CHECKLIST 05: NEEDS REAL FILES — genesis_1..4, fpt_1..2, bss_1..4 -->
+<section class="chapter" id="ch5-genesis" data-rail="work" data-rail-full="05 / deploy to production — Professional Path">
+  <div class="wrap">
+    <span class="eyebrow"><span class="mono">05 / deploy to production</span> — Professional Path</span>
+    <div class="spread">
+      <div>
+        <h2 class="chapter-h" data-split>Genesis Escape — reading a room in real time.</h2>
+        <p class="meta" style="color:var(--accent);font-family:'Space Grotesk',monospace;font-size:.85rem;margin-bottom:1rem">Game Master · 3 months, 2024</p>
+        <p class="body-copy" data-rv>As a Game Master I learned to read emotion in real time — when a customer is frustrated or genuinely scared — while playing the NPC, controlling the game's pace, and steering the room's mood at once. It's a very specific kind of leadership training.</p>
+      </div>
+      <div class="spread-media">
+        <div class="grid-2" data-rv>
+          <div class="imgbox" style="aspect-ratio:2/3"><img src="images/genesis_1.jpg" alt="Genesis Escape" width="500" height="750" loading="lazy" data-lightbox><span class="img-label">genesis_1.jpg</span></div>
+          <div class="imgbox" style="aspect-ratio:2/3"><img src="images/genesis_2.jpg" alt="Genesis Escape" width="500" height="750" loading="lazy" data-lightbox><span class="img-label">genesis_2.jpg</span></div>
         </div>
-    </section>
+      </div>
+    </div>
+  </div>
+</section>
 
-    <!-- CHAPTER 5: PROFESSIONAL PATH (DARK MODE) -->
-    <section id="ch5-genesis">
-        <span class="chapter-num reveal-up">05 · PROFESSIONAL PATH</span>
-        <div class="spread-grid mb-4">
-            <div class="spread-text reveal-up">
-                <h2>3 MONTHS, 2024<br>Genesis Escape: Reading emotions.</h2>
-                <p>As a Game Master, I learned to read human emotion in real time: when customers are frustrated or afraid. I had to turn myself into the NPC, control the game flow, and manage the customer's emotional flow simultaneously. That emotional-regulation skill is leadership training of a very specific kind.</p>
-            </div>
-            <div class="grid-2 reveal-up">
-                <div class="img-placeholder" style="aspect-ratio: 2/3;"><img src="images/genesis_1.jpg" loading="lazy"><div class="img-label">genesis_1.jpg</div></div>
-                <div class="img-placeholder" style="aspect-ratio: 2/3;"><img src="images/genesis_2.jpg" loading="lazy"><div class="img-label">genesis_2.jpg</div></div>
-                <div class="img-placeholder" style="aspect-ratio: 2/3;"><img src="images/genesis_3.jpg" loading="lazy"><div class="img-label">genesis_3.jpg</div></div>
-                <div class="img-placeholder" style="aspect-ratio: 2/3;"><img src="images/genesis_4.jpg" loading="lazy"><div class="img-label">genesis_4.jpg</div></div>
-            </div>
+<section class="chapter" id="ch5-fpt">
+  <div class="wrap">
+    <h2 class="chapter-h" data-split>FPT IS — Project Coordinator Intern.</h2>
+    <p class="meta" style="color:var(--accent);font-family:'Space Grotesk',monospace;font-size:.85rem;margin-bottom:1rem">May–Nov 2025</p>
+    <p class="body-copy" data-rv>Coordinated 200+ daily Scrum sync-ups between bank clients (HDBank, MB, Vietcombank) and offshore delivery teams; cut meeting duration by 60–75% and measurably sped up blocker removal.</p>
+    <button class="cs-toggle" type="button" aria-expanded="false" aria-controls="cs-fpt">
+      <span class="pm" aria-hidden="true">+</span> Case study
+    </button>
+    <div class="cs-panel" id="cs-fpt" role="region" aria-label="FPT IS case study">
+      <div><div class="cs-body">
+        <div><h4>The challenge</h4><p>Daily Scrum sync-ups between bank clients (HDBank, MB, Vietcombank) and offshore delivery teams were running long and slowing decisions.</p></div>
+        <div><h4>My role</h4><ul><li>Coordinated 200+ of these sync-ups end to end.</li><li>Owned the agenda, the blocker list, and the follow-ups.</li><li>Held the line on time-boxing across time zones.</li></ul></div>
+        <div><h4>Approach</h4><ul><li>Pre-collected blockers before each call.</li><li>Time-boxed every agenda item.</li><li>Pushed decisions to the owner in the room rather than parking them.</li></ul></div>
+        <div><h4>Findings</h4><ul><li>Meeting duration fell by 60–75%.</li><li>Blocker removal and decision-making measurably sped up <mark>[TODO: any hard figure]</mark>.</li></ul></div>
+        <div><h4>Recommendation</h4><p class="rec">Recommended the pre-collected-blocker format become the standard for cross-timezone delivery syncs, with a named decision owner on every item.</p></div>
+        <div><h4>Impact</h4><p>Delivered a repeatable meeting format that shortened a recurring 200+-instance ceremony and moved decisions closer to the people accountable for them.</p></div>
+        <div><h4>Evidence</h4><p><mark>[TODO: 2–4 captioned screenshots — agenda template, blocker tracker, before/after duration chart.]</mark></p></div>
+        <div><h4>Capabilities demonstrated</h4><ul><li><strong>Facilitation:</strong> ran high-frequency ceremonies without losing momentum.</li><li><strong>Ownership:</strong> converted a vague standing meeting into a measured process.</li></ul></div>
+        <div><h4>Skills acquired</h4><ul class="chips" style="margin:0"><li>Stakeholder coordination</li><li>Agile ceremonies</li><li>Cross-timezone delivery</li></ul></div>
+      </div></div>
+    </div>
+  </div>
+</section>
+
+<section class="chapter" id="ch5-bss">
+  <div class="wrap">
+    <h2 class="chapter-h" data-split>BSS Commerce — Business Analyst.</h2>
+    <p class="meta" style="color:var(--accent);font-family:'Space Grotesk',monospace;font-size:.85rem;margin-bottom:1rem">Jan 2026 to present</p>
+    <p class="body-copy" data-rv>Authored requirement documentation, drove feature visualisation, and led UAT validation — reaching a 95% UAT pass rate per feature and cutting post-release hotfixes by 40%.</p>
+    <button class="cs-toggle" type="button" aria-expanded="false" aria-controls="cs-bss">
+      <span class="pm" aria-hidden="true">+</span> Case study
+    </button>
+    <div class="cs-panel" id="cs-bss" role="region" aria-label="BSS Commerce case study">
+      <div><div class="cs-body">
+        <div><h4>The challenge</h4><p>Features were reaching release with requirement gaps that surfaced as post-release hotfixes.</p></div>
+        <div><h4>My role</h4><ul><li>Authored requirement documentation for <mark>[TODO: product / team]</mark>.</li><li>Drove feature visualisation with stakeholders and engineers.</li><li>Led UAT validation before each release.</li></ul></div>
+        <div><h4>Approach</h4><ul><li>Traced each stated request back to the underlying requirement.</li><li>Built a UAT pass/fail checklist per feature against acceptance criteria.</li><li>Ran a market-research study alongside the delivery work.</li></ul></div>
+        <div><h4>Findings</h4><ul><li>Reached a 95% UAT pass rate per feature.</li><li>Cut post-release hotfixes by 40%.</li><li>Market-research study projected to lift monthly recurring revenue by 25%.</li></ul></div>
+        <div><h4>Recommendation</h4><p class="rec">Recommended UAT sign-off against a written checklist become a release gate, and the market-research findings feed the next quarter's roadmap.</p></div>
+        <div><h4>Impact</h4><p>Reframed release quality from reactive hotfixing to a measured gate, and identified a revenue change worth a projected 25% MRR lift.</p></div>
+        <div><h4>Evidence</h4><p><mark>[TODO: 2–4 captioned screenshots — requirement doc, UAT checklist, hotfix trend, market-research summary.]</mark></p></div>
+        <div><h4>Capabilities demonstrated</h4><ul><li><strong>Requirements engineering:</strong> found the real requirement under the stated one.</li><li><strong>Quality ownership:</strong> made "it works" provable before ship.</li></ul></div>
+        <div><h4>Skills acquired</h4><ul class="chips" style="margin:0"><li>Requirements engineering</li><li>UAT strategy</li><li>Market research</li><li>Feature specification</li></ul></div>
+      </div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= 06 / repositories — KEY PROJECTS ======================= -->
+<section class="chapter" id="projects" data-rail="projects" data-rail-full="06 / repositories — Key Projects">
+  <div class="wrap">
+    <span class="eyebrow"><span class="mono">06 / repositories</span> — Key Projects</span>
+    <h2 class="chapter-h" data-split>Three builds, each one the capability the next one needed.</h2>
+
+    <div class="proj" data-rv>
+      <p class="arc">“I can run a software project end to end.”</p>
+      <p class="code">PRJ-01 · AI PRODUCT DELIVERY</p>
+      <h3>MatureCare — AI Assistant Chatbot App</h3>
+      <p class="when">Oct 2025 – Jan 2026 · Project Manager (Scrum) &amp; QA</p>
+      <p class="desc">Led Agile Scrum delivery for two software projects — sprint planning, stand-ups, retrospectives — and owned QA against acceptance criteria.</p>
+      <div class="stats">
+        <div><b>90%+</b><span>user-story acceptance rate per sprint</span></div>
+        <div><b>2</b><span>projects delivered in parallel</span></div>
+      </div>
+      <p class="tools">Scrum · SRS · Test cases · Backlog management</p>
+      <button class="cs-toggle" type="button" aria-expanded="false" aria-controls="cs-prj1"><span class="pm" aria-hidden="true">+</span> Case study</button>
+      <div class="cs-panel" id="cs-prj1" role="region" aria-label="MatureCare case study">
+        <div><div class="cs-body">
+          <div><h4>The challenge</h4><p>Two student software projects needed to ship in parallel with no dedicated delivery lead and only acceptance criteria to steer by.</p></div>
+          <div><h4>My role</h4><ul><li>Owned Scrum delivery for both projects.</li><li>Ran sprint planning, daily stand-ups, and retrospectives.</li><li>Owned QA sign-off against acceptance criteria.</li></ul></div>
+          <div><h4>Approach</h4><ul><li>Wrote the vision, SRS, product backlog, and acceptance criteria up front.</li><li>Kept both backlogs on one cadence so context-switching stayed cheap.</li><li>Tested each story against its acceptance criteria before calling it done.</li></ul></div>
+          <div><h4>Findings</h4><ul><li>Held a 90%+ user-story acceptance rate per sprint.</li><li>Both projects delivered on the same timeline without a slip.</li></ul></div>
+          <div><h4>Recommendation</h4><p class="rec">Recommended the up-front SRS-plus-acceptance-criteria pack become the default kickoff artefact for student delivery teams.</p></div>
+          <div><h4>Impact</h4><p>Delivered two projects end to end and a reusable documentation template the next cohort could start from.</p></div>
+          <div><h4>Evidence</h4><p><mark>[TODO: 2–4 captioned screenshots — backlog board, SRS excerpt, burndown, acceptance-criteria checklist.]</mark></p></div>
+          <div><h4>Capabilities demonstrated</h4><ul><li><strong>Delivery leadership:</strong> ran full Scrum cadence for parallel projects.</li><li><strong>Quality gate:</strong> tied "done" to written acceptance criteria.</li></ul></div>
+          <div><h4>Skills acquired</h4><ul class="chips" style="margin:0"><li>Scrum facilitation</li><li>SRS authoring</li><li>Acceptance testing</li></ul></div>
+        </div></div>
+      </div>
+    </div>
+
+    <div class="proj" data-rv>
+      <p class="arc">“I can turn a policy problem into a funded plan.”</p>
+      <p class="code">PRJ-02 · STRATEGY &amp; PITCH</p>
+      <h3>TapXanh — Public-Transport Green App</h3>
+      <p class="when">June 2025 · Global Leadership Experience</p>
+      <p class="desc">Designed an incentive-based public-transport solution and a 5-year rollout plan, pitched in four minutes.</p>
+      <div class="stats">
+        <div><b>80 / 20</b><span>government / private-equity funding split</span></div>
+        <div><b>5-year</b><span>strategic plan</span></div>
+      </div>
+      <p class="tools">Strategic planning · Financial modelling · Pitching</p>
+    </div>
+
+    <div class="proj" data-rv>
+      <p class="arc">“I can build the tool that fixes the data.”</p>
+      <p class="code">PRJ-03 · IT SUPPORT &amp; TOOLING</p>
+      <h3>Inventory Management &amp; Price-Checking App</h3>
+      <p class="when">Sep 2023 – present · IT Support Specialist, Thuy Thailand Consumer Goods</p>
+      <p class="desc">Built a web-based inventory and price-checking app around a scanning workflow to stop manual-entry drift.</p>
+      <div class="stats">
+        <div><b>90%</b><span>data-accuracy improvement</span></div>
+        <div><b>1,300+</b><span>products brought under control</span></div>
+      </div>
+      <p class="tools">Web app · Barcode scanning workflow · Data reconciliation</p>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= 07 / releases & tags — RECOGNITION ======================= -->
+<section class="chapter" id="awards" data-rail="recognition" data-rail-full="07 / releases &amp; tags — Recognition">
+  <div class="wrap">
+    <span class="eyebrow"><span class="mono">07 / releases &amp; tags</span> — Recognition</span>
+    <h2 class="chapter-h" data-split>Four tags worth pointing at.</h2>
+    <div class="award" data-rv>
+      <h3>Inspiring Leaders Award — RMIT Student Leadership Recognition, 2025</h3>
+      <p>RMIT's award for students who've shown sustained, values-driven leadership across the university community.</p>
+      <div class="link-row"><a href="https://www.facebook.com/photo?fbid=1095594939258597&set=a.557749446376485" target="_blank" rel="noopener">View announcement</a></div>
+    </div>
+    <div class="award" data-rv>
+      <h3>Top 5 — RMIT Choice Awards</h3>
+      <p>Voted into the top five <mark>[TODO: category]</mark> in RMIT's student-choice awards.</p>
+      <div class="link-row"><a href="https://www.facebook.com/photo?fbid=1194977572672296&set=a.638345255002200" target="_blank" rel="noopener">View announcement</a></div>
+    </div>
+    <div class="award" data-rv>
+      <h3>Dean's List Award</h3>
+      <p>Recognised on the RMIT Dean's List for sustained academic performance — top 1% of GPA across the SSET program.</p>
+    </div>
+    <div class="award" data-rv>
+      <h3>Welcoming the Australian Minister for Education</h3>
+      <p>One of four students chosen from across all RMIT Vietnam faculties to formally welcome the Australian Minister for Education on an official visit to the Hanoi campus.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= 08 / open a pull request — CONTACT ======================= -->
+<section class="chapter light-section" id="contact" data-rail="contact" data-rail-full="08 / open a pull request — Contact">
+  <div class="wrap">
+    <span class="eyebrow"><span class="mono">08 / open a pull request</span> — Contact</span>
+    <h2 class="chapter-h" data-split>Let's build something.</h2>
+    <p class="lede" data-rv>Open to graduate and early-career roles in business analysis, enterprise systems, and technical delivery. I reply within 24 hours.</p>
+    <div class="contact-grid" style="margin-top:2.5rem">
+      <div class="contact-info" data-rv>
+        <p><strong>Phone</strong><br><a href="tel:+84865949604">+84 865 949 604</a></p>
+        <p><strong>Email</strong><br><a href="mailto:juneng2108@gmail.com">juneng2108@gmail.com</a></p>
+        <p><strong>LinkedIn</strong><br><a href="https://www.linkedin.com/in/ngoc-dung-nguyen-june/" target="_blank" rel="noopener">ngoc-dung-nguyen-june</a></p>
+        <p style="margin-top:1.4rem;color:#6c665c">Based in Hanoi, Vietnam — open to remote.</p>
+      </div>
+      <!-- TODO: replace XXXXXXXX with June's real Formspree endpoint -->
+      <form id="contactForm" action="https://formspree.io/f/XXXXXXXX" method="POST" data-rv>
+        <div class="field">
+          <label for="cf-name">Full name</label>
+          <input type="text" id="cf-name" name="name" required autocomplete="name">
         </div>
-    </section>
-
-    <section id="ch5-fpt">
-        <div class="spread-grid reverse mb-4">
-            <div class="spread-text reveal-up">
-                <h2>6 MONTHS, MAY to NOV 2025<br>FPT IS: Project Coordinator Intern.</h2>
-                <p>Coordinated 200+ daily Scrum sync-up meetings between bank clients (HDBank, MB, Vietcombank) and offshore delivery teams. Shortened meeting duration by 60-75% and accelerated decision-making and blocker removal.</p>
-            </div>
-            <div class="grid-2 reveal-up">
-                <div class="img-placeholder" style="aspect-ratio: 3/4;"><img src="images/fpt_1.jpg" loading="lazy"><div class="img-label">fpt_1.jpg</div></div>
-                <div class="img-placeholder" style="aspect-ratio: 3/4;"><img src="images/fpt_2.jpg" loading="lazy"><div class="img-label">fpt_2.jpg</div></div>
-            </div>
+        <div class="field">
+          <label for="cf-email">Email</label>
+          <input type="email" id="cf-email" name="email" required autocomplete="email">
         </div>
-    </section>
-
-    <section id="ch5-bss">
-        <div class="spread-grid mb-4">
-            <div class="spread-text reveal-up">
-                <h2>JAN 2026 to CURRENT<br>BSS Commerce: Business Analyst.</h2>
-                <p>Authoring requirement documentation, driving feature visualization, and leading UAT validation. Achieved 95% UAT pass rate per feature and reduced post-release hotfixes by 40%. Performed market research projected to increase monthly recurring revenue by 25%.</p>
-            </div>
-            <div class="grid-4 reveal-up">
-                <div class="img-placeholder" style="aspect-ratio: 1/1;"><img src="images/bss_1.jpg" loading="lazy"><div class="img-label">bss_1.jpg</div></div>
-                <div class="img-placeholder" style="aspect-ratio: 1/1;"><img src="images/bss_2.jpg" loading="lazy"><div class="img-label">bss_2.jpg</div></div>
-                <div class="img-placeholder" style="aspect-ratio: 1/1;"><img src="images/bss_3.jpg" loading="lazy"><div class="img-label">bss_3.jpg</div></div>
-                <div class="img-placeholder" style="aspect-ratio: 1/1;"><img src="images/bss_4.jpg" loading="lazy"><div class="img-label">bss_4.jpg</div></div>
-            </div>
+        <fieldset class="intent">
+          <legend>What are you reaching out about?</legend>
+          <div class="intent-pills">
+            <label><input type="radio" name="topic" value="Graduate role" checked><span>Graduate role</span></label>
+            <label><input type="radio" name="topic" value="Internship"><span>Internship</span></label>
+            <label><input type="radio" name="topic" value="Contract"><span>Contract</span></label>
+            <label><input type="radio" name="topic" value="Coffee chat"><span>Coffee chat</span></label>
+            <label><input type="radio" name="topic" value="Collaboration"><span>Collaboration</span></label>
+            <label><input type="radio" name="topic" value="Other"><span>Other</span></label>
+          </div>
+        </fieldset>
+        <div class="field">
+          <label for="cf-msg">Message</label>
+          <textarea id="cf-msg" name="message" rows="5" required></textarea>
         </div>
-    </section>
+        <button class="submit-btn" type="submit" id="cfSubmit">Send request <span aria-hidden="true">&rarr;</span></button>
+        <p id="cfStatus" role="status" aria-live="polite" style="margin-top:1rem;font-size:.85rem;color:var(--accent)"></p>
+      </form>
+    </div>
+  </div>
+</section>
 
-    <!-- PROJECTS SECTION -->
-    <section id="projects">
-        <span class="chapter-num reveal-up">06 · KEY PROJECTS</span>
-        <h2 class="reveal-up mb-4" style="font-size: 4rem;">Academic & Professional Builds.</h2>
-        
-        <div class="project-card reveal-up">
-            <h3>MatureCare (AI Assistant Chatbot App)</h3>
-            <p style="color: var(--accent); margin: 0.5rem 0;">Oct 2025 – Jan 2026 · Project Manager (Scrum) & QA</p>
-            <p>Led Agile Scrum delivery for 2 software projects. Ran sprint planning, daily stand-ups, and retrospectives. Produced end-to-end project documentation including vision, SRS, product backlog, and acceptance criteria. Drove QA resulting in 90%+ acceptance rate of user stories per sprint.</p>
-        </div>
-        
-        <div class="project-card reveal-up">
-            <h3>TapXanh (Public Transport Green App)</h3>
-            <p style="color: var(--accent); margin: 0.5rem 0;">June 2025 · Global Leadership Experience</p>
-            <p>Led the design of an incentive-based public transport solution. Developed a 5-year strategic plan with 80% government funding and 20% private equity. Delivered a 4-minute pitch receiving strong validation for clarity and local relevance.</p>
-        </div>
+</main>
 
-        <div class="project-card reveal-up">
-            <h3>Web-based Inventory Management & Price-checking App</h3>
-            <p style="color: var(--accent); margin: 0.5rem 0;">Sep 2023 - Current · IT Support Specialist</p>
-            <p>Built a web-based inventory management & price-checking app using a scanning workflow. Improved data accuracy by 90% across 1,300+ products, strengthening operational reliability for Thuy Thailand Consumer Goods.</p>
-        </div>
-    </section>
+<footer class="foot">June Nguyen · IT &amp; Business Analysis · RMIT University Vietnam</footer>
 
-    <!-- RECOGNITION (DARK MODE) -->
-    <section id="awards">
-        <span class="chapter-num reveal-up">07 · RECOGNITION</span>
-        <h2 class="reveal-up mb-4" style="font-size: 5rem;">Inspiring Leaders Award.</h2>
-        <div class="spread-grid mb-4">
-            <div class="img-placeholder reveal-up" style="aspect-ratio: 3/4;">
-                <img src="images/inspiring_leader.jpg" loading="lazy">
-                <div class="img-label">inspiring_leader.jpg</div>
-            </div>
-            <div class="reveal-up">
-                <p style="font-size: 1.2rem; margin-bottom: 2rem;">I received the Inspiring Leaders Award, RMIT's Student Leadership Recognition Award for 2025. The award recognizes students who have demonstrated sustained, values-driven leadership across the university community.</p>
-                <div class="media-card" style="margin-top: 0;">
-                    <h4>READ: Inspiring Leaders Article</h4>
-                    <p><a href="https://www.facebook.com/photo?fbid=1095594939258597&set=a.557749446376485" target="_blank">View Facebook Post</a></p>
-                </div>
-            </div>
-        </div>
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Enlarged image">
+  <button class="lb-close" id="lbClose" aria-label="Close image (Esc)">&times;</button>
+  <img id="lbImg" src="" alt="">
+</div>
 
-        <h3 class="reveal-up" style="font-size: 3rem; margin-top: 4rem; margin-bottom: 2rem;">Top 5 RMIT Choice Awards.</h3>
-        <div class="grid-2 reveal-up">
-            <div class="img-placeholder" style="aspect-ratio: 1/1;"><img src="images/rmit_choice_1.jpg" loading="lazy"><div class="img-label">rmit_choice_1.jpg</div></div>
-            <div class="img-placeholder" style="aspect-ratio: 1/1;"><img src="images/rmit_choice_2.jpg" loading="lazy"><div class="img-label">rmit_choice_2.jpg</div></div>
-        </div>
-        <div class="media-card reveal-up">
-            <h4>READ: RMIT Choice Awards Article</h4>
-            <p><a href="https://www.facebook.com/photo?fbid=1194977572672296&set=a.638345255002200" target="_blank">View Facebook Post</a></p>
-        </div>
+<!-- TOAST -->
+<div class="toast" id="toast" role="status" aria-live="polite">Request received — June will reply within 24 hours.</div>
 
-        <h3 class="reveal-up" style="font-size: 3rem; margin-top: 4rem; margin-bottom: 2rem;">Dean's List Award.</h3>
-        <div class="grid-2 reveal-up">
-            <div class="img-placeholder" style="aspect-ratio: 3/2;"><img src="images/deans_list_1.jpg" loading="lazy"><div class="img-label">deans_list_1.jpg</div></div>
-            <div class="img-placeholder" style="aspect-ratio: 3/2;"><img src="images/deans_list_2.jpg" loading="lazy"><div class="img-label">deans_list_2.jpg</div></div>
-        </div>
-        <p class="reveal-up" style="margin-top: 2rem; max-width: 800px;">Recognized on the RMIT Dean's List for sustained academic excellence, placing in the Top 1% of GPA across the entire SSET program.</p>
+<!-- ===================== SCRIPTS ===================== -->
+<script src="assets/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.3.11/dist/lenis.min.js"></script>
 
-        <h3 class="reveal-up" style="font-size: 3rem; margin-top: 4rem; margin-bottom: 2rem;">Welcoming the Australian Minister for Education.</h3>
-        <div class="grid-2 reveal-up">
-            <div class="img-placeholder" style="aspect-ratio: 3/4;"><img src="images/minister_1.jpg" loading="lazy"><div class="img-label">minister_1.jpg</div></div>
-            <div class="img-placeholder" style="aspect-ratio: 3/4;"><img src="images/minister_2.jpg" loading="lazy"><div class="img-label">minister_2.jpg</div></div>
-        </div>
-        <div class="grid-4 reveal-up" style="margin-top: 1rem;">
-            <div class="img-placeholder" style="aspect-ratio: 1/1;"><img src="images/minister_add1.jpg" loading="lazy"><div class="img-label">minister_add1.jpg</div></div>
-            <div class="img-placeholder" style="aspect-ratio: 1/1;"><img src="images/minister_add2.jpg" loading="lazy"><div class="img-label">minister_add2.jpg</div></div>
-            <div class="img-placeholder" style="aspect-ratio: 1/1;"><img src="images/minister_add3.jpg" loading="lazy"><div class="img-label">minister_add3.jpg</div></div>
-            <div class="img-placeholder" style="aspect-ratio: 1/1;"><img src="images/minister_add4.jpg" loading="lazy"><div class="img-label">minister_add4.jpg</div></div>
-        </div>
-        <p class="reveal-up" style="margin-top: 2rem; max-width: 800px;">One of four students selected from across all RMIT Vietnam faculties to formally welcome the Australian Minister for Education during an official visit to the Ha Noi campus.</p>
-    </section>
+<script>
+(function(){
+"use strict";
+/* Hero systems adapted from ThreeUI SylvaHero by Meng To — MIT.
+   Everything else (reveals, foreground handoff, rail, sparks, case studies,
+   form, lightbox a11y, image fallback) written from scratch for this site. */
 
-    <!-- CONTACT SECTION -->
-    <section id="contact" class="light-section">
-        <span class="chapter-num reveal-up">08 · CONTACT</span>
-        <h2 class="reveal-up mb-4" style="font-size: 5rem;">Let's build something.</h2>
-        <div class="contact-grid">
-            <div class="contact-info reveal-up">
-                <p><strong>Phone:</strong> <a href="tel:+84865949604">+84 865 949 604</a></p>
-                <p><strong>Email:</strong> <a href="mailto:juneng2108@gmail.com">juneng2108@gmail.com</a></p>
-                <p><strong>LinkedIn:</strong> <a href="https://www.linkedin.com/in/ngoc-dung-nguyen-june/" target="_blank">ngoc-dung-nguyen-june</a></p>
-                <p><strong>Portfolio:</strong> <a href="https://ngocdungnguyen.github.io/NgocDungPort/" target="_blank">ngocdungnguyen.github.io</a></p>
-                <p style="margin-top: 2rem; color: #666;">Based in Hanoi, Vietnam. Open to global opportunities.</p>
-            </div>
-            <form class="reveal-up" onsubmit="alert('Message sent! (Demo)'); return false;">
-                <div class="form-group">
-                    <label>Your Name</label>
-                    <input type="text" required>
-                </div>
-                <div class="form-group">
-                    <label>Your Email</label>
-                    <input type="email" required>
-                </div>
-                <div class="form-group">
-                    <label>Message</label>
-                    <textarea rows="5" required></textarea>
-                </div>
-                <button type="submit" class="submit-btn">Send Message</button>
-            </form>
-        </div>
-    </section>
+var html = document.documentElement;
+var qs = function(s,c){ return (c||document).querySelector(s); };
+var qsa = function(s,c){ return Array.prototype.slice.call((c||document).querySelectorAll(s)); };
+var params = new URLSearchParams(location.search);
 
-    <!-- GSAP & Lenis CDNs -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.27/bundled/lenis.min.js"></script>
+var REDUCE = matchMedia('(prefers-reduced-motion: reduce)').matches;
+if (REDUCE) html.classList.add('reduce-motion');
+var FINE = matchMedia('(hover:hover) and (pointer:fine)').matches;
+var COARSE = matchMedia('(pointer:coarse)').matches;
+var NOGL = params.get('nogl') === '1';
 
-    <script>
-        gsap.registerPlugin(ScrollTrigger);
+var small = innerWidth < 820 || innerWidth*innerHeight < 620000;
 
-        // 1. Smooth Scroll
-        const lenis = new Lenis({ duration: 1.2, smoothWheel: true });
-        lenis.on('scroll', ScrollTrigger.update);
-        gsap.ticker.add((time) => { lenis.raf(time * 1000); });
-        gsap.ticker.lagSmoothing(0);
+/* ------------------------------------------------------------------ *
+ * 0. Kinetic hero type — build per-letter spans
+ * ------------------------------------------------------------------ */
+qsa('.hero h1 .row').forEach(function(row){
+  var word = row.getAttribute('data-word') || row.textContent || '';
+  row.textContent = '';
+  var frag = document.createDocumentFragment();
+  for (var i=0;i<word.length;i++){
+    var s = document.createElement('span');
+    s.className = 'ltr';
+    s.textContent = word[i];
+    s.style.setProperty('--d', (i*45)+'ms');
+    frag.appendChild(s);
+  }
+  row.appendChild(frag);
+});
 
-        // 2. Custom Cursor
-        const dot = document.getElementById('cursorDot');
-        window.addEventListener('mousemove', e => {
-            gsap.to(dot, { x: e.clientX, y: e.clientY, duration: 0.2, ease: 'power2.out' });
-        });
+/* ------------------------------------------------------------------ *
+ * 1. Word-by-word chapter headings — split, keep aria-label
+ * ------------------------------------------------------------------ */
+qsa('h2.chapter-h[data-split]').forEach(function(h){
+  var text = h.textContent.trim();
+  h.setAttribute('aria-label', text);
+  var words = text.split(/\s+/);
+  h.textContent = '';
+  words.forEach(function(w,i){
+    var wrap = document.createElement('span');
+    wrap.className = 'w'; wrap.setAttribute('aria-hidden','true');
+    var inner = document.createElement('i');
+    inner.textContent = w;
+    inner.style.setProperty('--wd', (i*55)+'ms');
+    wrap.appendChild(inner);
+    h.appendChild(wrap);
+    h.appendChild(document.createTextNode(' '));
+  });
+});
 
-        // 3. Progress Bar
-        window.addEventListener('scroll', () => {
-            const h = document.documentElement;
-            const percent = (h.scrollTop || document.body.scrollTop) / ((h.scrollHeight - h.clientHeight)) * 100;
-            document.getElementById('progress').style.width = percent + '%';
-        });
+/* ------------------------------------------------------------------ *
+ * 2. Image error → dominant-colour block + label (no 404 noise)
+ * ------------------------------------------------------------------ */
+var palette = ['#3a2b23','#2b2f3a','#243a2e','#3a2438','#38341f','#1f2f38','#332a3a','#3a2a2a'];
+function hashColor(src){ var n=0; for(var i=0;i<src.length;i++) n=(n*31+src.charCodeAt(i))|0; return palette[Math.abs(n)%palette.length]; }
+function swapToFallback(img){
+  var box = img.parentElement;
+  if (!box || box.__fellBack) return;
+  box.__fellBack = true;
+  var label = box.querySelector('.img-label');
+  var name = label ? label.textContent : (img.getAttribute('src')||'image');
+  img.remove();
+  box.classList.add('img-fallback');
+  box.style.background = hashColor(name);
+  if (!label){
+    label = document.createElement('span');
+    label.className = 'img-label';
+    label.textContent = name;
+    box.appendChild(label);
+  }
+}
+qsa('.imgbox img').forEach(function(img){
+  img.addEventListener('error', function(){ swapToFallback(img); });
+  if (img.complete && img.naturalWidth === 0) swapToFallback(img);
+});
 
-        // 4. Kinetic Typography Hero
-        gsap.to('.hero h1 span', {
-            opacity: 1, y: 0, rotate: 0, stagger: 0.05, duration: 1, ease: 'power4.out', delay: 0.2
-        });
-        gsap.to('.hero .subtitle', { opacity: 1, duration: 1, delay: 1 });
+/* ------------------------------------------------------------------ *
+ * 3. Entrance choreography + failsafe
+ * ------------------------------------------------------------------ */
+var introDone = false;
+function showEverything(){
+  document.body.classList.add('is-ready');
+  if (!introDone){
+    introDone = true;
+    setTimeout(function(){ document.body.classList.add('intro-done'); }, REDUCE ? 0 : 2900);
+  }
+  var pl = qs('#preloader');
+  if (pl){ pl.classList.add('done'); setTimeout(function(){ pl.remove(); }, 700); }
+}
+var failsafe = setTimeout(showEverything, 4000);
+function ready(){ clearTimeout(failsafe); showEverything(); }
 
-        // 5. Staggered Reveals (batched for scroll performance)
-        ScrollTrigger.batch('.reveal-up', {
-            start: 'top 85%',
-            onEnter: batch => gsap.to(batch, {
-                opacity: 1, y: 0, duration: 1, ease: 'power3.out', stagger: 0.1
-            })
-        });
+if (document.fonts && document.fonts.ready){
+  document.fonts.ready.then(function(){ requestAnimationFrame(ready); });
+  setTimeout(ready, 1500); // don't wait forever on fonts
+} else {
+  requestAnimationFrame(ready);
+}
 
-        // 6. Image Lightbox
-        const lightbox = document.createElement('div');
-        lightbox.className = 'lightbox';
-        lightbox.innerHTML = '<button class="lightbox-close" aria-label="Close image">&times;</button><img src="" alt="">';
-        document.body.appendChild(lightbox);
-        const lightboxImg = lightbox.querySelector('img');
+/* ------------------------------------------------------------------ *
+ * 4. Count-up manifest
+ * ------------------------------------------------------------------ */
+function countUp(el){
+  var target = parseFloat(el.getAttribute('data-count'));
+  var prefix = el.getAttribute('data-prefix') || '';
+  var suffix = el.getAttribute('data-suffix') || '';
+  if (REDUCE || isNaN(target)){ el.textContent = prefix + target + suffix; return; }
+  var start = performance.now(), dur = 1100;
+  function step(now){
+    var t = Math.min(1, (now - start) / dur);
+    var e = 1 - Math.pow(1 - t, 3);
+    el.textContent = prefix + Math.round(target * e) + suffix;
+    if (t < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+var manifestIO = new IntersectionObserver(function(en){
+  en.forEach(function(e){
+    if (e.isIntersecting){ qsa('dt[data-count]', e.target).forEach(countUp); manifestIO.disconnect(); }
+  });
+}, { threshold: 0.4 });
+if (qs('#manifest')) manifestIO.observe(qs('#manifest'));
 
-        document.querySelectorAll('.img-placeholder img').forEach(img => {
-            img.addEventListener('click', () => {
-                lightboxImg.src = img.currentSrc || img.src;
-                lightboxImg.alt = img.alt;
-                lightbox.classList.add('active');
-            });
-        });
+/* ------------------------------------------------------------------ *
+ * 5. [data-rv] reveals + word-heading reveals (IntersectionObserver)
+ * ------------------------------------------------------------------ */
+if (REDUCE){
+  qsa('[data-rv]').forEach(function(el){ el.classList.add('in'); });
+  qsa('h2.chapter-h').forEach(function(el){ el.classList.add('in'); });
+} else {
+  var rvIO = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if (!e.isIntersecting) return;
+      var el = e.target;
+      if (el.hasAttribute('data-rv')){
+        // per-group stagger: index among data-rv siblings in same parent
+        var sibs = el.parentElement ? qsa(':scope > [data-rv]', el.parentElement) : [el];
+        var idx = sibs.indexOf(el);
+        el.style.setProperty('--rvd', (Math.max(0,idx)*70) + 'ms');
+      }
+      el.classList.add('in');
+      rvIO.unobserve(el);
+    });
+  }, { threshold: 0.15, rootMargin: '0px 0px -8% 0px' });
+  qsa('[data-rv], h2.chapter-h').forEach(function(el){ rvIO.observe(el); });
+}
 
-        function closeLightbox() {
-            lightbox.classList.remove('active');
-            lightboxImg.src = '';
+/* ------------------------------------------------------------------ *
+ * 6. Click-to-load embeds (replace eager iframes)
+ * ------------------------------------------------------------------ */
+qsa('.poster[data-embed]').forEach(function(p){
+  var btn = p.querySelector('.pbtn');
+  btn.addEventListener('click', function(){
+    var f = document.createElement('iframe');
+    f.src = p.getAttribute('data-embed');
+    f.setAttribute('allow','autoplay; encrypted-media; fullscreen');
+    f.setAttribute('allowfullscreen','');
+    f.setAttribute('title','Embedded video');
+    p.innerHTML = '';
+    p.appendChild(f);
+  });
+});
+
+/* ------------------------------------------------------------------ *
+ * 7. Case-study expandable panels
+ * ------------------------------------------------------------------ */
+qsa('.cs-toggle').forEach(function(btn){
+  var panel = document.getElementById(btn.getAttribute('aria-controls'));
+  btn.addEventListener('click', function(){
+    var open = btn.getAttribute('aria-expanded') === 'true';
+    btn.setAttribute('aria-expanded', String(!open));
+    panel.classList.toggle('open', !open);
+  });
+});
+
+/* ------------------------------------------------------------------ *
+ * 8. Lightbox with focus trap
+ * ------------------------------------------------------------------ */
+var lb = qs('#lightbox'), lbImg = qs('#lbImg'), lbClose = qs('#lbClose'), lbTrigger = null;
+function openLightbox(src, alt, trigger){
+  lbImg.src = src; lbImg.alt = alt || '';
+  lb.classList.add('active');
+  lbTrigger = trigger || document.activeElement;
+  lbClose.focus();
+  document.addEventListener('keydown', lbKey);
+}
+function closeLightbox(){
+  lb.classList.remove('active'); lbImg.src = '';
+  document.removeEventListener('keydown', lbKey);
+  if (lbTrigger && lbTrigger.focus) lbTrigger.focus();
+}
+function lbKey(e){
+  if (e.key === 'Escape') closeLightbox();
+  if (e.key === 'Tab'){ e.preventDefault(); lbClose.focus(); } // single focusable → trap
+}
+lbClose.addEventListener('click', closeLightbox);
+lb.addEventListener('click', function(e){ if (e.target === lb) closeLightbox(); });
+qsa('img[data-lightbox]').forEach(function(img){
+  img.setAttribute('role','button');
+  img.setAttribute('tabindex','0');
+  img.setAttribute('aria-label','Enlarge image: ' + (img.alt || 'photo'));
+  function go(){ openLightbox(img.currentSrc || img.src, img.alt, img); }
+  img.addEventListener('click', go);
+  img.addEventListener('keydown', function(e){ if (e.key==='Enter' || e.key===' '){ e.preventDefault(); go(); } });
+});
+
+/* ------------------------------------------------------------------ *
+ * 9. Contact form → Formspree (busy state + toast)
+ * ------------------------------------------------------------------ */
+var form = qs('#contactForm');
+if (form){
+  var submitBtn = qs('#cfSubmit'), statusEl = qs('#cfStatus'), toast = qs('#toast');
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    var endpoint = form.getAttribute('action');
+    if (endpoint.indexOf('XXXXXXXX') !== -1){
+      statusEl.textContent = 'Form not yet wired — add June’s Formspree endpoint (TODO).';
+      return;
+    }
+    submitBtn.disabled = true;
+    var orig = submitBtn.innerHTML;
+    submitBtn.innerHTML = 'Sending…';
+    statusEl.textContent = '';
+    fetch(endpoint, { method:'POST', body:new FormData(form), headers:{ 'Accept':'application/json' } })
+      .then(function(r){
+        if (r.ok){
+          form.reset();
+          toast.classList.add('show');
+          setTimeout(function(){ toast.classList.remove('show'); }, 5000);
+        } else {
+          statusEl.textContent = 'Something went wrong — email juneng2108@gmail.com directly.';
         }
-        lightbox.querySelector('.lightbox-close').addEventListener('click', closeLightbox);
-        lightbox.addEventListener('click', e => { if (e.target === lightbox) closeLightbox(); });
-        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+      })
+      .catch(function(){ statusEl.textContent = 'Network error — email juneng2108@gmail.com directly.'; })
+      .finally(function(){ submitBtn.disabled = false; submitBtn.innerHTML = orig; });
+  });
+}
 
-        // 7. Light/Dark Mode Toggles
-        const lightSections = document.querySelectorAll('.light-section');
-        lightSections.forEach(sec => {
-            ScrollTrigger.create({
-                trigger: sec, start: 'top 30%', end: 'bottom 30%',
-                onToggle: self => document.body.classList.toggle('light-mode', self.isActive)
-            });
-        });
-    </script>
+/* ------------------------------------------------------------------ *
+ * 10. Sticky "open to roles" pill
+ * ------------------------------------------------------------------ */
+var pill = qs('#rolesPill'), pillDismissed = false;
+qs('#rolesDismiss').addEventListener('click', function(){ pillDismissed = true; pill.classList.remove('show'); });
+var contactEl = qs('#contact');
+
+/* ------------------------------------------------------------------ *
+ * 11. Chapter progress rail
+ * ------------------------------------------------------------------ */
+var railHost = qs('#rail');
+var railSections = qsa('section[data-rail]');
+var railBtns = [];
+if (!COARSE && innerWidth > 1100){
+  railSections.forEach(function(sec){
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.innerHTML = '<span class="lbl">' + sec.getAttribute('data-rail') + '</span><span class="tick" aria-hidden="true"></span>';
+    b.setAttribute('aria-label', 'Go to ' + (sec.getAttribute('data-rail-full') || sec.getAttribute('data-rail')));
+    b.addEventListener('click', function(){ scrollToEl(sec); });
+    railHost.appendChild(b);
+    railBtns.push({ btn:b, sec:sec });
+  });
+}
+
+/* ------------------------------------------------------------------ *
+ * 12. Smooth scroll (Lenis) + one shared rAF via GSAP ticker
+ * ------------------------------------------------------------------ */
+var lenis = null;
+if (window.gsap){
+  gsap.registerPlugin(ScrollTrigger);
+  gsap.ticker.lagSmoothing(0);
+}
+if (!REDUCE && window.Lenis){
+  lenis = new Lenis({ duration: 1.15, smoothWheel: true, wheelMultiplier: 0.9 });
+  if (window.gsap) lenis.on('scroll', ScrollTrigger.update);
+}
+function scrollToEl(el){
+  if (lenis) lenis.scrollTo(el, { offset: 0, duration: 1.1 });
+  else el.scrollIntoView({ behavior: REDUCE ? 'auto' : 'smooth', block: 'start' });
+}
+// intercept dock + in-page anchor clicks for Lenis
+qsa('a[href^="#"]').forEach(function(a){
+  a.addEventListener('click', function(e){
+    var id = a.getAttribute('href');
+    if (id.length < 2) return;
+    var t = qs(id);
+    if (t){ e.preventDefault(); scrollToEl(t); history.replaceState(null,'',id); }
+  });
+});
+
+/* ------------------------------------------------------------------ *
+ * 13. Magnetic dock (proximity magnification + specular rim)
+ * ------------------------------------------------------------------ */
+var dock = qs('#dock');
+var dockLinks = qsa('#dock a');
+var dockState = dockLinks.map(function(){ return { cur:0, tgt:0 }; });
+var dockPointer = { x: -9999, y: -9999, inside: false };
+var specAngle = 90, specTarget = 90;
+
+if (!COARSE && FINE){
+  dock.addEventListener('pointermove', function(e){
+    dockPointer.x = e.clientX; dockPointer.y = e.clientY; dockPointer.inside = true;
+    var r = dock.getBoundingClientRect();
+    specTarget = Math.atan2(e.clientY - (r.top + r.height/2), e.clientX - (r.left + r.width/2)) * 180/Math.PI + 90;
+  });
+  dock.addEventListener('pointerleave', function(){ dockPointer.inside = false; });
+  // keyboard mirror
+  dockLinks.forEach(function(a,i){
+    a.addEventListener('focus', function(){ dockState[i].tgt = 0.22; });
+    a.addEventListener('blur', function(){ dockState[i].tgt = 0; });
+  });
+}
+function updateDock(){
+  if (COARSE || !FINE) return;
+  for (var i=0;i<dockLinks.length;i++){
+    var st = dockState[i];
+    if (dockPointer.inside){
+      var r = dockLinks[i].getBoundingClientRect();
+      var dx = dockPointer.x - (r.left + r.width/2);
+      var dy = dockPointer.y - (r.top + r.height/2);
+      var dist = Math.sqrt(dx*dx + dy*dy);
+      var influence = Math.max(0, 1 - dist / 170);
+      st.tgt = influence * 0.34;
+    } else if (document.activeElement !== dockLinks[i]){
+      st.tgt = 0;
+    }
+    st.cur += (st.tgt - st.cur) * 0.18;
+    var v = Math.round(st.cur * 1000) / 1000;
+    if (v !== st.last){ dockLinks[i].style.setProperty('--d', v); st.last = v; }
+  }
+  specAngle += (specTarget - specAngle) * 0.1;
+  dock.style.setProperty('--spec-angle', (Math.round(specAngle*10)/10) + 'deg');
+}
+
+/* ------------------------------------------------------------------ *
+ * 14. Auto-hide header + progress bar + rail active + pill
+ * ------------------------------------------------------------------ */
+var header = qs('#siteHeader');
+var progress = qs('#progress');
+var lastScroll = 0;
+var heroEl = qs('#hero');
+function onScrollState(){
+  var y = window.scrollY || window.pageYOffset;
+  var docH = document.documentElement.scrollHeight - window.innerHeight;
+  var p = docH > 0 ? y / docH : 0;
+  progress.style.transform = 'scaleX(' + (Math.round(p*1000)/1000) + ')';
+
+  var heroH = heroEl ? heroEl.offsetHeight : window.innerHeight;
+  // header
+  if (y > heroH * 0.6 && y > lastScroll + 4) header.classList.add('hidden');
+  else if (y < lastScroll - 4 || y < heroH * 0.3) header.classList.remove('hidden');
+  header.classList.toggle('washed', y > 40);
+  lastScroll = y;
+
+  // pill: after 60% of hero, hide at contact
+  if (!pillDismissed){
+    var contactTop = contactEl.getBoundingClientRect().top;
+    var show = y > heroH * 0.6 && contactTop > window.innerHeight * 0.5;
+    pill.classList.toggle('show', show);
+  }
+
+  // rail active = last section whose top passed 40% viewport
+  if (railBtns.length){
+    var mark = window.innerHeight * 0.4, active = -1;
+    for (var i=0;i<railBtns.length;i++){
+      if (railBtns[i].sec.getBoundingClientRect().top <= mark) active = i;
+    }
+    railBtns.forEach(function(o,idx){ o.btn.setAttribute('aria-current', String(idx === active)); });
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ * 15. Foreground-stage handoff
+ * ------------------------------------------------------------------ */
+var fgHost = qs('#fg-sky');
+var fgSections = qsa('[data-fg]');
+var fgMap = fgSections.map(function(sec){
+  var cluster = sec.querySelector('[data-fg-cluster]');
+  return { sec:sec, cluster:cluster, home:cluster ? cluster.parentElement : null };
+});
+var fgCurrent = null;
+function positionCluster(entry){
+  if (!entry || !entry.home) return;
+  var r = entry.home.getBoundingClientRect();
+  var w = Math.min(r.width, window.innerWidth - r.left - 28);
+  entry.cluster.style.left = r.left + 'px';
+  entry.cluster.style.width = w + 'px';
+}
+function setActiveFg(entry){
+  if (fgCurrent === entry) return;
+  if (fgCurrent){
+    var prev = fgCurrent;
+    prev.cluster.classList.remove('fg-active');
+    prev.cluster.classList.add('fg-retiring');
+    (function(p){
+      setTimeout(function(){
+        p.cluster.classList.remove('fg-retiring');
+        p.cluster.classList.add('parked');
+        if (p.home){
+          p.home.appendChild(p.cluster);
+          p.cluster.style.left = ''; p.cluster.style.width = '';
+          if (p.slotEl){ p.slotEl.style.height = ''; }
+        }
+      }, REDUCE ? 0 : 820);
+    })(prev);
+  }
+  fgCurrent = entry;
+  if (entry){
+    // freeze the in-flow slot height so layout doesn't collapse
+    var slot = entry.home.closest('.fg-slot') || entry.home;
+    entry.slotEl = slot;
+    slot.style.height = entry.home.getBoundingClientRect().height + 'px';
+    entry.cluster.classList.remove('parked');
+    fgHost.appendChild(entry.cluster);
+    positionCluster(entry);
+    void entry.cluster.offsetWidth; // force reflow so transition plays
+    entry.cluster.classList.add('fg-active');
+  }
+}
+window.addEventListener('resize', function(){ positionCluster(fgCurrent); });
+if (!REDUCE && fgMap.length && 'IntersectionObserver' in window){
+  var fgIO = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      var m = fgMap.filter(function(x){ return x.sec === e.target; })[0];
+      if (m) m._ratio = e.isIntersecting ? e.intersectionRatio : 0;
+    });
+    // choose the most-intersecting data-fg section
+    var best = null, bestRatio = 0.12;
+    fgMap.forEach(function(m){
+      if ((m._ratio || 0) > bestRatio){ bestRatio = m._ratio; best = m; }
+    });
+    setActiveFg(best);
+  }, { threshold: [0, 0.12, 0.3, 0.5, 0.75] });
+  fgMap.forEach(function(m){ if (m.cluster) fgIO.observe(m.sec); });
+} else {
+  // no IO / reduced motion: reveal every cluster in place, never re-parent
+  fgMap.forEach(function(m){ if (m.cluster) m.cluster.classList.add('fg-active'); });
+}
+
+/* ------------------------------------------------------------------ *
+ * 16. Light / dark section switching (ScrollTrigger)
+ * ------------------------------------------------------------------ */
+if (window.gsap){
+  qsa('.light-section').forEach(function(sec){
+    ScrollTrigger.create({
+      trigger: sec, start: 'top 35%', end: 'bottom 35%',
+      onToggle: function(self){ document.body.classList.toggle('light-mode', self.isActive); }
+    });
+  });
+  // hero scroll-out fade for #hero-gl
+  ScrollTrigger.create({
+    trigger: heroEl, start: 'top top', end: 'bottom top',
+    onUpdate: function(self){
+      var gl = qs('#hero-gl');
+      if (gl) gl.style.opacity = String(Math.max(0, 1 - self.progress / 0.6));
+    },
+    onLeave: function(){ heroVisible = false; },
+    onEnterBack: function(){ heroVisible = true; }
+  });
+}
+
+/* ------------------------------------------------------------------ *
+ * 17. Pointer parallax (.par) — eased, rounded, skip-if-unchanged
+ * ------------------------------------------------------------------ */
+var parLayers = qsa('.par');
+var pointer = { x:0, y:0, sx:0, sy:0 };
+if (FINE && !COARSE && !REDUCE){
+  window.addEventListener('pointermove', function(e){
+    pointer.x = (e.clientX / innerWidth - 0.5) * 2;
+    pointer.y = (e.clientY / innerHeight - 0.5) * 2;
+  }, { passive:true });
+}
+function updateParallax(){
+  if (!parLayers.length || REDUCE) return;
+  pointer.sx += (pointer.x - pointer.sx) * 0.055;
+  pointer.sy += (pointer.y - pointer.sy) * 0.055;
+  var rx = Math.round(pointer.sx * 1000) / 1000;
+  var ry = Math.round(pointer.sy * 1000) / 1000;
+  if (rx === updateParallax._x && ry === updateParallax._y) return;
+  updateParallax._x = rx; updateParallax._y = ry;
+  for (var i=0;i<parLayers.length;i++){
+    var pd = parseFloat(parLayers[i].getAttribute('data-pd') || '10');
+    parLayers[i].style.transform = 'translate3d(' + (rx*pd).toFixed(3) + 'px,' + (ry*pd).toFixed(3) + 'px,0)';
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ * 18. Custom cursor + pointer-trail sparks (fine pointer only)
+ * ------------------------------------------------------------------ */
+var cursor = qs('#cursorDot');
+if (FINE && !COARSE && !REDUCE){
+  html.classList.add('fine-cursor');
+  var cx = 0, cy = 0, tx = 0, ty = 0, cursorOn = false;
+  var sparks = [], lastSparkX = 0, lastSparkY = 0;
+  window.addEventListener('pointermove', function(e){
+    tx = e.clientX; ty = e.clientY;
+    if (!cursorOn){ cursorOn = true; cursor.classList.add('on'); cx = tx; cy = ty; }
+    var d = Math.hypot(tx - lastSparkX, ty - lastSparkY);
+    if (d > 26 && sparks.length < 18){
+      lastSparkX = tx; lastSparkY = ty;
+      var s = document.createElement('div');
+      s.className = 'spark';
+      document.body.appendChild(s);
+      sparks.push({ el:s, x:tx, y:ty, life:1, vx:(Math.random()-0.5)*0.4, vy:(Math.random()-0.5)*0.4 });
+    }
+  }, { passive:true });
+  qsa('a,button,summary,[data-lightbox],.cs-toggle,input,textarea').forEach(function(el){
+    el.addEventListener('pointerenter', function(){ cursor.classList.add('wide'); });
+    el.addEventListener('pointerleave', function(){ cursor.classList.remove('wide'); });
+  });
+  window.addEventListener('pointerdown', function(){ cursor.classList.add('wide'); });
+  window.addEventListener('pointerup', function(){ cursor.classList.remove('wide'); });
+
+  var updateCursor = function(dt){
+    cx += (tx - cx) * Math.min(1, dt * 14);
+    cy += (ty - cy) * Math.min(1, dt * 14);
+    cursor.style.transform = 'translate3d(' + cx.toFixed(2) + 'px,' + cy.toFixed(2) + 'px,0) translate(-50%,-50%)';
+    for (var i = sparks.length - 1; i >= 0; i--){
+      var sp = sparks[i];
+      sp.life -= dt * 1.7;
+      if (sp.life <= 0){ sp.el.remove(); sparks.splice(i,1); continue; }
+      sp.x += sp.vx; sp.y += sp.vy;
+      sp.el.style.opacity = (sp.life * 0.6).toFixed(3);
+      sp.el.style.transform = 'translate3d(' + sp.x.toFixed(2) + 'px,' + sp.y.toFixed(2) + 'px,0) translate(-50%,-50%) scale(' + sp.life.toFixed(3) + ')';
+    }
+  };
+  window.__updateCursor = updateCursor;
+}
+
+/* ------------------------------------------------------------------ *
+ * 19. Hero WebGL atmosphere
+ * ------------------------------------------------------------------ */
+var heroVisible = true;
+var renderHero = null;
+var glCanvas = qs('#hero-gl');
+
+function buildHeroGL(){
+  if (NOGL || !window.THREE || !glCanvas){ if (glCanvas) glCanvas.classList.add('gone'); return; }
+  var THREE = window.THREE, renderer, scene, camera, motes, gradMat, clock;
+  try {
+    renderer = new THREE.WebGLRenderer({ canvas: glCanvas, alpha: true, antialias: !small, powerPreference: 'low-power' });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, small ? 1.6 : 2));
+    renderer.setSize(innerWidth, innerHeight, false);
+    renderer.setClearColor(0x000000, 0);
+    if (renderer.toneMapping !== undefined){ renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.1; }
+  } catch(err){ glCanvas.classList.add('gone'); return; }
+
+  scene = new THREE.Scene();
+  scene.fog = new THREE.FogExp2(0x0a0705, 0.02);
+  camera = new THREE.PerspectiveCamera(55, innerWidth/innerHeight, 0.1, 100);
+  camera.position.set(0, 0, 14);
+  clock = new THREE.Clock();
+
+  /* --- full-screen gradient plane with glow lobe + grain --- */
+  gradMat = new THREE.ShaderMaterial({
+    depthWrite: false, depthTest: false,
+    uniforms: { uTime:{value:0}, uRes:{value:new THREE.Vector2(innerWidth,innerHeight)} },
+    vertexShader: 'varying vec2 vUv; void main(){ vUv=uv; gl_Position=vec4(position.xy,0.0,1.0); }',
+    fragmentShader: [
+      'precision highp float;',
+      'varying vec2 vUv;',
+      'uniform float uTime; uniform vec2 uRes;',
+      'float hash(vec2 p){ return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453); }',
+      'void main(){',
+      '  vec2 uv = vUv;',
+      '  vec3 top = vec3(0.019,0.019,0.019);',
+      '  vec3 bot = vec3(0.039,0.027,0.020);',
+      '  vec3 col = mix(bot, top, smoothstep(0.0,1.0,uv.y));',
+      '  vec2 gc = vec2(0.36 + 0.06*sin(uTime*0.05), 0.34 + 0.05*cos(uTime*0.04));',
+      '  float d = distance(vec2(uv.x, uv.y*(uRes.y/uRes.x)), vec2(gc.x, gc.y*(uRes.y/uRes.x)));',
+      '  float glow = smoothstep(0.55, 0.0, d);',
+      '  col += vec3(1.0,0.235,0.0) * glow * 0.16;',
+      '  float g = hash(uv*uRes*0.5 + uTime*60.0);',
+      '  col += (g - 0.5) * 0.02;',
+      '  gl_FragColor = vec4(col, 1.0);',
+      '}'
+    ].join('\n')
+  });
+  var gradMesh = new THREE.Mesh(new THREE.PlaneGeometry(2,2), gradMat);
+  gradMesh.frustumCulled = false; gradMesh.renderOrder = -1;
+  scene.add(gradMesh);
+
+  /* --- drifting embers / motes (GPU-animated) --- */
+  var COUNT = small ? 600 : 1400;
+  var geo = new THREE.BufferGeometry();
+  var pos = new Float32Array(COUNT*3), seed = new Float32Array(COUNT);
+  for (var i=0;i<COUNT;i++){
+    pos[i*3]   = (Math.random()-0.5) * 44;
+    pos[i*3+1] = (Math.random()-0.5) * 40;
+    pos[i*3+2] = (Math.random()-0.5) * 26 - 4;
+    seed[i] = Math.random();
+  }
+  geo.setAttribute('position', new THREE.BufferAttribute(pos,3));
+  geo.setAttribute('aSeed', new THREE.BufferAttribute(seed,1));
+  var moteMat = new THREE.ShaderMaterial({
+    transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+    uniforms: { uTime:{value:0}, uSize:{value: small ? 90 : 130} },
+    vertexShader: [
+      'attribute float aSeed; uniform float uTime; uniform float uSize;',
+      'varying float vTw;',
+      'void main(){',
+      '  vec3 p = position;',
+      '  float t = uTime * (0.15 + aSeed*0.25);',
+      '  p.y = mod(p.y + t*2.0 + 20.0, 40.0) - 20.0;',
+      '  p.x += sin(uTime*0.3 + aSeed*6.28) * (0.6 + aSeed);',
+      '  vec4 mv = modelViewMatrix * vec4(p,1.0);',
+      '  vTw = 0.55 + 0.45*sin(uTime*2.0 + aSeed*40.0);',
+      '  gl_PointSize = uSize * aSeed / max(-mv.z, 0.6);',
+      '  gl_Position = projectionMatrix * mv;',
+      '}'
+    ].join('\n'),
+    fragmentShader: [
+      'precision mediump float; varying float vTw;',
+      'void main(){',
+      '  vec2 c = gl_PointCoord - 0.5;',
+      '  float a = smoothstep(0.5, 0.0, length(c));',
+      '  vec3 amber = vec3(1.0, 0.5, 0.18);',
+      '  gl_FragColor = vec4(amber, a * vTw * 0.5);',
+      '}'
+    ].join('\n')
+  });
+  motes = new THREE.Points(geo, moteMat);
+  motes.frustumCulled = false;
+  scene.add(motes);
+
+  var glPointer = { x:0, y:0, sx:0, sy:0 };
+  if (FINE && !COARSE && !REDUCE){
+    window.addEventListener('pointermove', function(e){
+      glPointer.x = e.clientX / innerWidth - 0.5;
+      glPointer.y = e.clientY / innerHeight - 0.5;
+    }, { passive:true });
+  }
+
+  renderHero = function(dt, elapsed){
+    if (!heroVisible) return;
+    if (REDUCE){
+      // static frame only — no particle motion, no parallax
+      if (renderHero._done) return;
+      renderHero._done = true;
+      gradMat.uniforms.uTime.value = 8;
+      moteMat.uniforms.uTime.value = 8;
+      renderer.render(scene, camera);
+      return;
+    }
+    gradMat.uniforms.uTime.value = elapsed;
+    moteMat.uniforms.uTime.value = elapsed;
+    if (!REDUCE){
+      glPointer.sx += (glPointer.x - glPointer.sx) * 0.055;
+      glPointer.sy += (glPointer.y - glPointer.sy) * 0.055;
+      camera.position.x = -glPointer.sx * 20;
+      camera.position.y = glPointer.sy * 12;
+      camera.lookAt(glPointer.sx * 0.4, glPointer.sy * 0.4, 0);
+    }
+    renderer.render(scene, camera);
+  };
+
+  window.addEventListener('resize', function(){
+    renderer.setSize(innerWidth, innerHeight, false);
+    camera.aspect = innerWidth/innerHeight; camera.updateProjectionMatrix();
+    gradMat.uniforms.uRes.value.set(innerWidth, innerHeight);
+  });
+}
+
+/* ------------------------------------------------------------------ *
+ * 20. THE ONE SHARED rAF LOOP
+ * ------------------------------------------------------------------ */
+var lastT = performance.now();
+var glElapsed = 0;
+function frame(now){
+  var raw = (now - lastT) / 1000;
+  lastT = now;
+  var dt = Math.min(raw, 0.05);
+
+  if (lenis) lenis.raf(now);
+  onScrollState();
+  updateDock();
+  updateParallax();
+  if (window.__updateCursor) window.__updateCursor(dt);
+  if (renderHero){ glElapsed += dt; renderHero(dt, glElapsed); }
+}
+if (window.gsap){
+  gsap.ticker.add(function(){ frame(performance.now()); });
+} else {
+  (function loop(t){ frame(t); requestAnimationFrame(loop); })(performance.now());
+}
+
+document.addEventListener('visibilitychange', function(){
+  if (document.hidden){ heroVisible = false; }
+  else { var r = heroEl.getBoundingClientRect(); heroVisible = r.bottom > 0; lastT = performance.now(); }
+});
+
+/* observe hero visibility to stop GL rendering when scrolled away */
+if ('IntersectionObserver' in window && heroEl){
+  new IntersectionObserver(function(en){
+    heroVisible = en[0].isIntersecting;
+  }, { threshold: 0 }).observe(heroEl);
+}
+
+/* ------------------------------------------------------------------ *
+ * boot: entrance first, then (double rAF) build WebGL
+ * ------------------------------------------------------------------ */
+if (!window.THREE || NOGL){
+  if (glCanvas) glCanvas.classList.add('gone');
+} else {
+  requestAnimationFrame(function(){ requestAnimationFrame(function(){
+    try { buildHeroGL(); } catch(e){ if (glCanvas) glCanvas.classList.add('gone'); }
+  }); });
+}
+
+if (window.gsap){ window.addEventListener('load', function(){ ScrollTrigger.refresh(); }); }
+})();
+</script>
 </body>
 </html>
