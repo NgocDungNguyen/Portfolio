@@ -68,6 +68,15 @@ img{ max-width:100%; display:block; }
 
 .serif{ font-family:'Playfair Display',Georgia,serif; font-style:italic; letter-spacing:0; }
 
+/* visible "fact to confirm" marker — not the browser's yellow */
+mark{
+  background:transparent; color:var(--accent);
+  font-size:.82em; letter-spacing:.02em;
+  border:1px solid rgba(255,60,0,.45); border-radius:3px;
+  padding:.05em .4em; white-space:nowrap;
+}
+body.light-mode mark{ color:#c73000; border-color:rgba(199,48,0,.5); }
+
 /* ---- Accessibility helpers ------------------------------------------------ */
 .vh{
   position:absolute!important; width:1px; height:1px; padding:0; margin:-1px;
@@ -110,12 +119,35 @@ img{ max-width:100%; display:block; }
 }
 
 /* ---- Decorative fixed layers ----------------------------------------------- */
+/* persistent world canvas — flown by scroll, visible the whole journey */
 #hero-gl{
   position:fixed; inset:0; width:100%; height:100%;
   z-index:0; pointer-events:none; display:block;
-  transition:opacity .4s linear;
+  transition:opacity .5s linear;
 }
 #hero-gl.gone{ opacity:0!important; }
+
+/* When the 3D world is running, every chapter carries a local readability
+   scrim that fades out top and bottom so the moving world shows through
+   between sections and dimly behind the text. Without .world-on (no WebGL /
+   ?nogl=1 / no JS) sections stay fully opaque via the body theme. */
+html.world-on section.chapter{
+  background:linear-gradient(180deg,
+    transparent 0%, rgba(5,5,5,.86) 18%, rgba(5,5,5,.9) 50%,
+    rgba(5,5,5,.9) 82%, transparent 100%);
+}
+html.world-on section.chapter.light-section{
+  background:linear-gradient(180deg,
+    transparent 0%, rgba(244,241,234,.95) 18%, rgba(244,241,234,.97) 50%,
+    rgba(244,241,234,.97) 82%, transparent 100%);
+}
+html.world-on .hero{
+  background:linear-gradient(95deg, rgba(5,5,5,.74) 0%, rgba(5,5,5,.52) 42%, rgba(5,5,5,.12) 72%, transparent 100%);
+}
+html.world-on .marquee{ background:rgba(5,5,5,.86); }
+html.world-on body.light-mode .marquee{ background:rgba(244,241,234,.95); }
+html.world-on .foot{ background:rgba(5,5,5,.82); }
+html.world-on body.light-mode .foot{ background:rgba(244,241,234,.95); }
 
 #vignette{
   position:fixed; inset:0; z-index:55; pointer-events:none;
@@ -213,7 +245,7 @@ body.light-mode .dock a{ color:var(--light-ink); }
 .roles-pill{
   position:fixed; bottom:1.4rem; left:50%; z-index:49;
   transform:translate(-50%,180%);
-  display:flex; align-items:center; gap:.9rem;
+  display:flex; align-items:center; gap:.9rem; text-wrap:balance;
   background:var(--accent); color:#fff;
   padding:.75rem 1rem .75rem 1.3rem; border-radius:999px;
   font-size:.85rem; font-weight:600; box-shadow:0 12px 40px rgba(255,60,0,.35);
@@ -223,9 +255,10 @@ body.light-mode .dock a{ color:var(--light-ink); }
 .roles-pill.show{ transform:translate(-50%,0); }
 .roles-pill a{ text-decoration:underline; text-underline-offset:3px; }
 .roles-pill button{
-  all:unset; width:26px; height:26px; display:grid; place-items:center;
+  all:unset; width:26px; height:26px; flex:0 0 auto; display:grid; place-items:center;
   border-radius:50%; background:rgba(255,255,255,.2); font-size:1rem; line-height:1;
 }
+@media (max-width:520px){ .roles-pill{ font-size:.78rem; padding:.7rem .8rem .7rem 1rem; gap:.6rem; } }
 .roles-pill button:hover{ background:rgba(255,255,255,.35); }
 
 /* ---- Chapter progress rail (desktop only) ---------------------------------- */
@@ -1358,7 +1391,7 @@ var REDUCE = matchMedia('(prefers-reduced-motion: reduce)').matches;
 if (REDUCE) html.classList.add('reduce-motion');
 var FINE = matchMedia('(hover:hover) and (pointer:fine)').matches;
 var COARSE = matchMedia('(pointer:coarse)').matches;
-var NOGL = params.get('nogl') === '1';
+var NOGL = params.get('nogl') === '1' || params.get('flat') === '1';
 
 var small = innerWidth < 820 || innerWidth*innerHeight < 620000;
 
@@ -1479,21 +1512,33 @@ if (REDUCE){
   qsa('[data-rv]').forEach(function(el){ el.classList.add('in'); });
   qsa('h2.chapter-h').forEach(function(el){ el.classList.add('in'); });
 } else {
+  var revealEl = function(el){
+    if (el.classList.contains('in')) return;
+    if (el.hasAttribute('data-rv')){
+      var sibs = el.parentElement ? qsa(':scope > [data-rv]', el.parentElement) : [el];
+      el.style.setProperty('--rvd', (Math.max(0, sibs.indexOf(el)) * 70) + 'ms');
+    }
+    el.classList.add('in');
+  };
   var rvIO = new IntersectionObserver(function(entries){
-    entries.forEach(function(e){
-      if (!e.isIntersecting) return;
-      var el = e.target;
-      if (el.hasAttribute('data-rv')){
-        // per-group stagger: index among data-rv siblings in same parent
-        var sibs = el.parentElement ? qsa(':scope > [data-rv]', el.parentElement) : [el];
-        var idx = sibs.indexOf(el);
-        el.style.setProperty('--rvd', (Math.max(0,idx)*70) + 'ms');
-      }
-      el.classList.add('in');
-      rvIO.unobserve(el);
-    });
+    entries.forEach(function(e){ if (e.isIntersecting){ revealEl(e.target); rvIO.unobserve(e.target); } });
   }, { threshold: 0.15, rootMargin: '0px 0px -8% 0px' });
-  qsa('[data-rv], h2.chapter-h').forEach(function(el){ rvIO.observe(el); });
+  var rvTargets = qsa('[data-rv], h2.chapter-h');
+  rvTargets.forEach(function(el){ rvIO.observe(el); });
+  /* safety sweep — after a fast programmatic / anchor scroll the observer can
+     miss elements that flew past; reveal anything already above the fold */
+  window.__revealSweep = function(){
+    for (var i=0;i<rvTargets.length;i++){
+      var el = rvTargets[i];
+      if (!el.classList.contains('in') && el.getBoundingClientRect().top < innerHeight * 0.95){
+        revealEl(el); rvIO.unobserve(el);
+      }
+    }
+  };
+  addEventListener('scroll', function(){
+    clearTimeout(window.__revealSweep._t);
+    window.__revealSweep._t = setTimeout(window.__revealSweep, 140);
+  }, { passive:true });
 }
 
 /* ------------------------------------------------------------------ *
@@ -1768,7 +1813,7 @@ function setActiveFg(entry){
   }
 }
 window.addEventListener('resize', function(){ positionCluster(fgCurrent); });
-if (!REDUCE && fgMap.length && 'IntersectionObserver' in window){
+if (!REDUCE && !COARSE && innerWidth > 900 && fgMap.length && 'IntersectionObserver' in window){
   var fgIO = new IntersectionObserver(function(entries){
     entries.forEach(function(e){
       var m = fgMap.filter(function(x){ return x.sec === e.target; })[0];
@@ -1802,16 +1847,6 @@ if (window.gsap){
       end: isLast ? 'bottom top' : 'bottom 35%',
       onToggle: function(self){ document.body.classList.toggle('light-mode', self.isActive); }
     });
-  });
-  // hero scroll-out fade for #hero-gl
-  ScrollTrigger.create({
-    trigger: heroEl, start: 'top top', end: 'bottom top',
-    onUpdate: function(self){
-      var gl = qs('#hero-gl');
-      if (gl) gl.style.opacity = String(Math.max(0, 1 - self.progress / 0.6));
-    },
-    onLeave: function(){ heroVisible = false; },
-    onEnterBack: function(){ heroVisible = true; }
   });
 }
 
@@ -1884,15 +1919,39 @@ if (FINE && !COARSE && !REDUCE){
 }
 
 /* ------------------------------------------------------------------ *
- * 19. Hero WebGL atmosphere
+ * 19. THE WORLD — one persistent 3D space, flown by scroll.
+ *     A luminous version-control graph through deep space: a meandering
+ *     trunk the camera travels, branches that peel off and merge back
+ *     (one never does), commit nodes, structural rings you pass through,
+ *     fog + drifting embers + an accent glow. All procedural — no assets.
  * ------------------------------------------------------------------ */
-var heroVisible = true;
-var renderHero = null;
+var worldVisible = true;
+var renderWorld = null;
 var glCanvas = qs('#hero-gl');
+var LEN = 260;             // world length along -Z
+var worldMaxScroll = 1;
+function measureWorld(){ worldMaxScroll = Math.max(1, document.documentElement.scrollHeight - innerHeight); }
 
-function buildHeroGL(){
+// 12 composed camera stations along the journey — one per rail beat + ends
+var WP = [
+  { p:[ -1.6, 1.4,  15 ], t:[  1.4, 0.4,  -12 ], fov:62 }, // 00 hero
+  { p:[  2.6, 1.2,  -16 ], t:[ -1.2, 0.6,  -34 ], fov:55 }, // README
+  { p:[ -3.4,-0.6,  -38 ], t:[  1.6, 0.5,  -56 ], fov:52 }, // robotics
+  { p:[  2.0, 1.7,  -60 ], t:[ -2.0, 0.9,  -78 ], fov:54 }, // podium / 2019
+  { p:[  5.0, 0.5,  -86 ], t:[  0.6, 0.3, -104 ], fov:50 }, // pivot (branch out)
+  { p:[ -5.4, 1.1, -110 ], t:[  2.2, 0.7, -128 ], fov:56 }, // mentorship (long branch)
+  { p:[  3.2,-0.8, -134 ], t:[ -1.6, 0.6, -152 ], fov:52 }, // rmit (merge)
+  { p:[ -2.4, 1.5, -158 ], t:[  1.2, 0.4, -176 ], fov:54 }, // tapxanh
+  { p:[  2.2, 0.7, -182 ], t:[ -1.2, 0.5, -200 ], fov:52 }, // work
+  { p:[ -3.6, 1.1, -206 ], t:[  1.6, 0.5, -224 ], fov:55 }, // projects
+  { p:[  1.8, 0.9, -230 ], t:[  0.0, 0.4, -248 ], fov:58 }, // recognition
+  { p:[  0.0, 0.5, -252 ], t:[  0.0, 0.2, -272 ], fov:62 }  // contact
+];
+
+function buildWorld(){
   if (NOGL || !window.THREE || !glCanvas){ if (glCanvas) glCanvas.classList.add('gone'); return; }
-  var THREE = window.THREE, renderer, scene, camera, motes, gradMat, clock;
+  var THREE = window.THREE, renderer, scene, camera, motes, gradMat, moteMat;
+  var nodes = [], rings = [];
   try {
     renderer = new THREE.WebGLRenderer({ canvas: glCanvas, alpha: true, antialias: !small, powerPreference: 'low-power' });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, small ? 1.6 : 2));
@@ -1902,33 +1961,26 @@ function buildHeroGL(){
   } catch(err){ glCanvas.classList.add('gone'); return; }
 
   scene = new THREE.Scene();
-  scene.fog = new THREE.FogExp2(0x0a0705, 0.02);
-  camera = new THREE.PerspectiveCamera(55, innerWidth/innerHeight, 0.1, 100);
-  camera.position.set(0, 0, 14);
-  clock = new THREE.Clock();
+  scene.fog = new THREE.FogExp2(0x0a0705, 0.028);
+  camera = new THREE.PerspectiveCamera(58, innerWidth/innerHeight, 0.1, 400);
+  camera.position.set(0, 0.6, 8);
 
-  /* --- full-screen gradient plane with glow lobe + grain --- */
+  /* --- full-screen gradient backdrop: dark vertical ramp + drifting glow lobe + grain --- */
   gradMat = new THREE.ShaderMaterial({
-    depthWrite: false, depthTest: false,
-    uniforms: { uTime:{value:0}, uRes:{value:new THREE.Vector2(innerWidth,innerHeight)} },
-    vertexShader: 'varying vec2 vUv; void main(){ vUv=uv; gl_Position=vec4(position.xy,0.0,1.0); }',
-    fragmentShader: [
-      'precision highp float;',
-      'varying vec2 vUv;',
-      'uniform float uTime; uniform vec2 uRes;',
+    depthWrite:false, depthTest:false,
+    uniforms:{ uTime:{value:0}, uRes:{value:new THREE.Vector2(innerWidth,innerHeight)} },
+    vertexShader:'varying vec2 vUv; void main(){ vUv=uv; gl_Position=vec4(position.xy,0.0,1.0); }',
+    fragmentShader:[
+      'precision highp float; varying vec2 vUv; uniform float uTime; uniform vec2 uRes;',
       'float hash(vec2 p){ return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453); }',
       'void main(){',
-      '  vec2 uv = vUv;',
-      '  vec3 top = vec3(0.019,0.019,0.019);',
-      '  vec3 bot = vec3(0.039,0.027,0.020);',
-      '  vec3 col = mix(bot, top, smoothstep(0.0,1.0,uv.y));',
-      '  vec2 gc = vec2(0.36 + 0.06*sin(uTime*0.05), 0.34 + 0.05*cos(uTime*0.04));',
-      '  float d = distance(vec2(uv.x, uv.y*(uRes.y/uRes.x)), vec2(gc.x, gc.y*(uRes.y/uRes.x)));',
-      '  float glow = smoothstep(0.55, 0.0, d);',
-      '  col += vec3(1.0,0.235,0.0) * glow * 0.16;',
-      '  float g = hash(uv*uRes*0.5 + uTime*60.0);',
-      '  col += (g - 0.5) * 0.02;',
-      '  gl_FragColor = vec4(col, 1.0);',
+      '  vec2 uv=vUv;',
+      '  vec3 col=mix(vec3(0.039,0.027,0.020), vec3(0.015,0.015,0.017), smoothstep(0.0,1.0,uv.y));',
+      '  vec2 gc=vec2(0.34+0.07*sin(uTime*0.05), 0.40+0.06*cos(uTime*0.037));',
+      '  float d=distance(vec2(uv.x,uv.y*(uRes.y/uRes.x)), vec2(gc.x,gc.y*(uRes.y/uRes.x)));',
+      '  col += vec3(1.0,0.235,0.0) * smoothstep(0.6,0.0,d) * 0.14;',
+      '  col += (hash(uv*uRes*0.5 + uTime*60.0)-0.5)*0.02;',
+      '  gl_FragColor=vec4(col,1.0);',
       '}'
     ].join('\n')
   });
@@ -1936,42 +1988,117 @@ function buildHeroGL(){
   gradMesh.frustumCulled = false; gradMesh.renderOrder = -1;
   scene.add(gradMesh);
 
-  /* --- drifting embers / motes (GPU-animated) --- */
+  /* --- the trunk: a meandering spine from z=+10 to z=-LEN-20 --- */
+  function trunkPoint(z){
+    return new THREE.Vector3(
+      Math.sin(z*0.045)*3.2 + Math.sin(z*0.011)*4.5,
+      Math.sin(z*0.03)*1.1 + 0.3,
+      z
+    );
+  }
+  var trunkPts = [];
+  for (var z=12; z>=-LEN-24; z-=4) trunkPts.push(trunkPoint(z));
+  var trunkCurve = new THREE.CatmullRomCurve3(trunkPts);
+  var amber = 0xff7d4d;
+  var trunkGeo = new THREE.TubeGeometry(trunkCurve, 260, 0.055, 6, false);
+  scene.add(new THREE.Mesh(trunkGeo, new THREE.MeshBasicMaterial({ color:amber, fog:true })));
+  var haloGeo = new THREE.TubeGeometry(trunkCurve, 160, 0.38, 6, false);
+  scene.add(new THREE.Mesh(haloGeo, new THREE.MeshBasicMaterial({
+    color:0xff3c00, transparent:true, opacity:0.05, blending:THREE.AdditiveBlending, depthWrite:false, fog:true
+  })));
+
+  /* --- branches: peel off the trunk, curve back to it (one never merges) --- */
+  var branchMat = new THREE.MeshBasicMaterial({ color:0xff8a5c, fog:true });
+  function addBranch(zStart, zEnd, side, merge){
+    var a = trunkPoint(zStart);
+    var mid = new THREE.Vector3(a.x + side*(6 + Math.random()*4), a.y + (Math.random()-0.5)*2, (zStart+zEnd)/2);
+    var end = merge ? trunkPoint(zEnd)
+                    : new THREE.Vector3(trunkPoint(zEnd).x + side*10, trunkPoint(zEnd).y + 1.5, zEnd);
+    var c = new THREE.CatmullRomCurve3([a, a.clone().lerp(mid,0.5), mid, mid.clone().lerp(end,0.6), end]);
+    scene.add(new THREE.Mesh(new THREE.TubeGeometry(c, 90, 0.035, 5, false), branchMat));
+    // a couple of commit dots on the branch
+    for (var k=0;k<3;k++){
+      var s = new THREE.Mesh(new THREE.SphereGeometry(0.09,8,8), new THREE.MeshBasicMaterial({ color:0xffd9c2, fog:true }));
+      s.position.copy(c.getPoint(0.25 + k*0.25));
+      scene.add(s);
+    }
+  }
+  addBranch(-30, -66, 1, true);     // robotics seasons
+  addBranch(-84, -104, 1, true);    // the pivot
+  addBranch(-108, -LEN-10, -1, false); // 03 long-running branch — never merges
+  addBranch(-150, -176, 1, true);   // rmit merge
+  addBranch(-198, -222, -1, true);  // projects
+
+  /* --- commit nodes at each station + minor dots along the trunk --- */
+  var nodeGeo = new THREE.SphereGeometry(0.16, 12, 12);
+  var glowTex = (function(){
+    var c = document.createElement('canvas'); c.width = c.height = 64;
+    var g = c.getContext('2d'), rad = g.createRadialGradient(32,32,0,32,32,32);
+    rad.addColorStop(0,'rgba(255,150,90,0.9)'); rad.addColorStop(1,'rgba(255,150,90,0)');
+    g.fillStyle = rad; g.fillRect(0,0,64,64);
+    var t = new THREE.CanvasTexture(c); return t;
+  })();
+  WP.forEach(function(w){
+    var p = trunkPoint(w.t ? (w.p[2]-10) : w.p[2]);
+    p = trunkPoint(w.p[2] - 12);
+    var n = new THREE.Mesh(nodeGeo, new THREE.MeshBasicMaterial({ color:0xffe9dc, fog:true }));
+    n.position.copy(p); scene.add(n); nodes.push(n);
+    var spr = new THREE.Sprite(new THREE.SpriteMaterial({ map:glowTex, transparent:true, blending:THREE.AdditiveBlending, depthWrite:false, opacity:0.95 }));
+    spr.scale.setScalar(3.1); spr.position.copy(p); scene.add(spr);
+  });
+  var dotN = small ? 40 : 80, dotPos = new Float32Array(dotN*3);
+  for (var d0=0; d0<dotN; d0++){
+    var pp = trunkPoint(10 - (d0/dotN)*(LEN+30));
+    dotPos[d0*3]=pp.x + (Math.random()-0.5)*0.6; dotPos[d0*3+1]=pp.y + (Math.random()-0.5)*0.6; dotPos[d0*3+2]=pp.z;
+  }
+  var dotGeo = new THREE.BufferGeometry();
+  dotGeo.setAttribute('position', new THREE.BufferAttribute(dotPos,3));
+  scene.add(new THREE.Points(dotGeo, new THREE.PointsMaterial({ color:0xffb98c, size:0.09, sizeAttenuation:true, transparent:true, opacity:0.9, fog:true })));
+
+  /* --- structural rings the camera passes through (surrounds you) --- */
+  var ringN = small ? 6 : 11;
+  var ringMat = new THREE.MeshBasicMaterial({ color:0x5a3a2e, transparent:true, opacity:0.5, fog:true });
+  for (var r0=0; r0<ringN; r0++){
+    var rz = -8 - r0*(LEN/(ringN-0.5));
+    var tp = trunkPoint(rz);
+    var ring = new THREE.Mesh(new THREE.TorusGeometry(5.4 + (r0%3)*1.3, 0.03, 6, 40), ringMat);
+    ring.position.set(tp.x, tp.y, rz);
+    ring.rotation.x = Math.PI/2 + (Math.random()-0.5)*0.3;
+    ring.rotation.z = Math.random()*Math.PI;
+    scene.add(ring); rings.push(ring);
+  }
+
+  /* --- drifting embers, GPU-animated; column recentres on the camera --- */
   var COUNT = small ? 600 : 1400;
   var geo = new THREE.BufferGeometry();
-  var pos = new Float32Array(COUNT*3), seed = new Float32Array(COUNT);
+  var epos = new Float32Array(COUNT*3), eseed = new Float32Array(COUNT);
   for (var i=0;i<COUNT;i++){
-    pos[i*3]   = (Math.random()-0.5) * 44;
-    pos[i*3+1] = (Math.random()-0.5) * 40;
-    pos[i*3+2] = (Math.random()-0.5) * 26 - 4;
-    seed[i] = Math.random();
+    epos[i*3]=(Math.random()-0.5)*46; epos[i*3+1]=(Math.random()-0.5)*40; epos[i*3+2]=(Math.random()-0.5)*70;
+    eseed[i]=Math.random();
   }
-  geo.setAttribute('position', new THREE.BufferAttribute(pos,3));
-  geo.setAttribute('aSeed', new THREE.BufferAttribute(seed,1));
-  var moteMat = new THREE.ShaderMaterial({
-    transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
-    uniforms: { uTime:{value:0}, uSize:{value: small ? 90 : 130} },
-    vertexShader: [
-      'attribute float aSeed; uniform float uTime; uniform float uSize;',
-      'varying float vTw;',
+  geo.setAttribute('position', new THREE.BufferAttribute(epos,3));
+  geo.setAttribute('aSeed', new THREE.BufferAttribute(eseed,1));
+  moteMat = new THREE.ShaderMaterial({
+    transparent:true, depthWrite:false, blending:THREE.AdditiveBlending,
+    uniforms:{ uTime:{value:0}, uSize:{value: small ? 85 : 120} },
+    vertexShader:[
+      'attribute float aSeed; uniform float uTime, uSize; varying float vTw;',
       'void main(){',
-      '  vec3 p = position;',
-      '  float t = uTime * (0.15 + aSeed*0.25);',
-      '  p.y = mod(p.y + t*2.0 + 20.0, 40.0) - 20.0;',
-      '  p.x += sin(uTime*0.3 + aSeed*6.28) * (0.6 + aSeed);',
-      '  vec4 mv = modelViewMatrix * vec4(p,1.0);',
-      '  vTw = 0.55 + 0.45*sin(uTime*2.0 + aSeed*40.0);',
-      '  gl_PointSize = uSize * aSeed / max(-mv.z, 0.6);',
-      '  gl_Position = projectionMatrix * mv;',
+      '  vec3 p=position;',
+      '  float t=uTime*(0.15+aSeed*0.25);',
+      '  p.y=mod(p.y + t*2.0 + 20.0, 40.0)-20.0;',
+      '  p.x+=sin(uTime*0.3+aSeed*6.28)*(0.6+aSeed);',
+      '  vec4 mv=modelViewMatrix*vec4(p,1.0);',
+      '  vTw=0.55+0.45*sin(uTime*2.0+aSeed*40.0);',
+      '  gl_PointSize=uSize*aSeed/max(-mv.z,0.6);',
+      '  gl_Position=projectionMatrix*mv;',
       '}'
     ].join('\n'),
-    fragmentShader: [
+    fragmentShader:[
       'precision mediump float; varying float vTw;',
       'void main(){',
-      '  vec2 c = gl_PointCoord - 0.5;',
-      '  float a = smoothstep(0.5, 0.0, length(c));',
-      '  vec3 amber = vec3(1.0, 0.5, 0.18);',
-      '  gl_FragColor = vec4(amber, a * vTw * 0.5);',
+      '  float a=smoothstep(0.5,0.0,length(gl_PointCoord-0.5));',
+      '  gl_FragColor=vec4(vec3(1.0,0.5,0.18), a*vTw*0.5);',
       '}'
     ].join('\n')
   });
@@ -1979,34 +2106,56 @@ function buildHeroGL(){
   motes.frustumCulled = false;
   scene.add(motes);
 
-  var glPointer = { x:0, y:0, sx:0, sy:0 };
+  /* --- camera rig: two Catmull-Rom curves sampled by scroll fraction --- */
+  var curveP = new THREE.CatmullRomCurve3(WP.map(function(w){ return new THREE.Vector3(w.p[0],w.p[1],w.p[2]); }));
+  var curveT = new THREE.CatmullRomCurve3(WP.map(function(w){ return new THREE.Vector3(w.t[0],w.t[1],w.t[2]); }));
+  var N = WP.length;
+  var _p = new THREE.Vector3(), _t = new THREE.Vector3();
+  var smooth = 0, gp = { x:0, y:0, sx:0, sy:0 };
   if (FINE && !COARSE && !REDUCE){
     window.addEventListener('pointermove', function(e){
-      glPointer.x = e.clientX / innerWidth - 0.5;
-      glPointer.y = e.clientY / innerHeight - 0.5;
+      gp.x = e.clientX/innerWidth - 0.5; gp.y = e.clientY/innerHeight - 0.5;
     }, { passive:true });
   }
 
-  renderHero = function(dt, elapsed){
-    if (!heroVisible) return;
+  measureWorld();
+  var lastRenderSmooth = -1;
+
+  renderWorld = function(dt, elapsed){
+    if (!worldVisible) return;
+    var frac = Math.min(1, Math.max(0, (window.scrollY || window.pageYOffset) / worldMaxScroll));
+
     if (REDUCE){
-      // static frame only — no particle motion, no parallax
-      if (renderHero._done) return;
-      renderHero._done = true;
-      gradMat.uniforms.uTime.value = 8;
-      moteMat.uniforms.uTime.value = 8;
+      // snap to nearest station, no ember/pulse motion, render only when it changed
+      var snapped = Math.round(frac * (N-1)) / (N-1);
+      if (Math.abs(snapped - lastRenderSmooth) < 0.0004 && renderWorld._did) return;
+      lastRenderSmooth = snapped; renderWorld._did = true;
+      curveP.getPoint(snapped, _p); curveT.getPoint(snapped, _t);
+      camera.position.copy(_p); camera.lookAt(_t);
+      gradMat.uniforms.uTime.value = 6; moteMat.uniforms.uTime.value = 6;
       renderer.render(scene, camera);
       return;
     }
+
+    smooth += (frac - smooth) * Math.min(1, dt * 5);
+    curveP.getPoint(smooth, _p); curveT.getPoint(smooth, _t);
+
+    // eased pointer parallax — a small hand-held drift
+    gp.sx += (gp.x - gp.sx) * 0.055; gp.sy += (gp.y - gp.sy) * 0.055;
+    _p.x += gp.sx * 1.6; _p.y += -gp.sy * 1.0;
+    _t.x -= gp.sx * 0.6; _t.y -= -gp.sy * 0.4;
+
+    camera.position.copy(_p);
+    camera.lookAt(_t);
+    var seg = smooth * (N-1), si = Math.min(N-2, Math.floor(seg)), sf = seg - si;
+    var fov = WP[si].fov + (WP[si+1].fov - WP[si].fov) * sf;
+    if (Math.abs(camera.fov - fov) > 0.01){ camera.fov = fov; camera.updateProjectionMatrix(); }
+
     gradMat.uniforms.uTime.value = elapsed;
     moteMat.uniforms.uTime.value = elapsed;
-    if (!REDUCE){
-      glPointer.sx += (glPointer.x - glPointer.sx) * 0.055;
-      glPointer.sy += (glPointer.y - glPointer.sy) * 0.055;
-      camera.position.x = -glPointer.sx * 20;
-      camera.position.y = glPointer.sy * 12;
-      camera.lookAt(glPointer.sx * 0.4, glPointer.sy * 0.4, 0);
-    }
+    motes.position.z = camera.position.z;           // embers always surround the camera
+    for (var i=0;i<nodes.length;i++) nodes[i].scale.setScalar(1 + 0.18*Math.sin(elapsed*2 + i*1.7));
+
     renderer.render(scene, camera);
   };
 
@@ -2014,7 +2163,10 @@ function buildHeroGL(){
     renderer.setSize(innerWidth, innerHeight, false);
     camera.aspect = innerWidth/innerHeight; camera.updateProjectionMatrix();
     gradMat.uniforms.uRes.value.set(innerWidth, innerHeight);
+    measureWorld();
   });
+
+  html.classList.add('world-on');
 }
 
 /* ------------------------------------------------------------------ *
@@ -2032,7 +2184,7 @@ function frame(now){
   updateDock();
   updateParallax();
   if (window.__updateCursor) window.__updateCursor(dt);
-  if (renderHero){ glElapsed += dt; renderHero(dt, glElapsed); }
+  if (renderWorld){ glElapsed += dt; renderWorld(dt, glElapsed); }
 }
 if (window.gsap){
   gsap.ticker.add(function(){ frame(performance.now()); });
@@ -2041,25 +2193,18 @@ if (window.gsap){
 }
 
 document.addEventListener('visibilitychange', function(){
-  if (document.hidden){ heroVisible = false; }
-  else { var r = heroEl.getBoundingClientRect(); heroVisible = r.bottom > 0; lastT = performance.now(); }
+  worldVisible = !document.hidden;
+  if (worldVisible) lastT = performance.now();
 });
 
-/* observe hero visibility to stop GL rendering when scrolled away */
-if ('IntersectionObserver' in window && heroEl){
-  new IntersectionObserver(function(en){
-    heroVisible = en[0].isIntersecting;
-  }, { threshold: 0 }).observe(heroEl);
-}
-
 /* ------------------------------------------------------------------ *
- * boot: entrance first, then (double rAF) build WebGL
+ * boot: entrance first, then (double rAF) build the world
  * ------------------------------------------------------------------ */
 if (!window.THREE || NOGL){
   if (glCanvas) glCanvas.classList.add('gone');
 } else {
   requestAnimationFrame(function(){ requestAnimationFrame(function(){
-    try { buildHeroGL(); } catch(e){ if (glCanvas) glCanvas.classList.add('gone'); }
+    try { buildWorld(); } catch(e){ if (glCanvas) glCanvas.classList.add('gone'); }
   }); });
 }
 
