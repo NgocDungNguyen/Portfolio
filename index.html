@@ -544,6 +544,13 @@ body.light-mode .poster .pbtn{ color:var(--light-ink); }
 .poster .pbtn:hover .play{ background:var(--accent); color:#fff; }
 .poster .lbl{ font-size:.8rem; letter-spacing:.08em; text-transform:uppercase; max-width:36ch; }
 .poster iframe{ position:absolute; inset:0; width:100%; height:100%; border:0; }
+/* extra media added through content/media.json */
+.media-extra{ display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:1rem; margin-top:2.5rem; }
+.media-extra .mx-item{ margin:0; }
+.media-extra .mx-item figcaption{ margin-top:.5rem; font-size:.8rem; opacity:.7; }
+.media-extra video{ width:100%; display:block; border:1px solid var(--line); background:#000; }
+.media-extra .poster{ margin-top:0; max-width:none; }
+.imgbox video{ width:100%; height:100%; object-fit:cover; display:block; }
 .link-row{ margin-top:1.4rem; display:flex; flex-wrap:wrap; gap:1rem; font-size:.9rem; }
 .link-row a{ border-bottom:1px solid var(--accent); text-decoration:none; padding-bottom:2px; }
 
@@ -1120,12 +1127,32 @@ html.reduce-motion #grain{ animation:none; }
 
 <section class="chapter light-section" id="ch4-hackathon">
   <div class="wrap">
-    <h2 class="chapter-h" data-split>Building under pressure — hackathons.</h2>
+    <span class="eyebrow"><span class="mono">2025</span> — Hackathon</span>
+    <h2 class="chapter-h" data-split>Hackathon 2025 — building under pressure.</h2>
     <p class="body-copy" data-rv>Hackathons force a working build in 24 to 48 hours. Each one has tightened my ability to lead a team through a problem with no textbook answer — decide fast, cut scope honestly, ship something that runs.</p>
     <div class="grid-3" style="margin-top:2rem" data-rv>
       <div class="imgbox" style="aspect-ratio:1/1"><img src="images/hackathon_game1.jpg" alt="Hackathon" width="500" height="500" loading="lazy" data-lightbox><span class="img-label">hackathon_game1.jpg</span></div>
       <div class="imgbox" style="aspect-ratio:1/1"><img src="images/hackathon_game2.jpg" alt="Hackathon" width="500" height="500" loading="lazy" data-lightbox><span class="img-label">hackathon_game2.jpg</span></div>
       <div class="imgbox" style="aspect-ratio:1/1"><img src="images/hackathon_game3.jpg" alt="Hackathon" width="500" height="500" loading="lazy" data-lightbox><span class="img-label">hackathon_game3.jpg</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- HACKATHON 2026 — slots: hackathon2026_1..3.jpg (add via tools/portfolio-admin) -->
+<section class="chapter light-section" id="ch4-hackathon-2026">
+  <div class="wrap">
+    <span class="eyebrow"><span class="mono">2026</span> — Hackathon</span>
+    <h2 class="chapter-h" data-split>Hackathon 2026 — Vietnam Champion.</h2>
+    <p class="meta" style="color:var(--accent);font-family:'Space Grotesk',monospace;font-size:.85rem;margin-bottom:1rem">Vietnam Champion Award <mark>[TODO: event name · date · city]</mark></p>
+    <p class="body-copy" data-rv style="max-width:62ch">Our team took the Vietnam Champion Award — the top result in the national field. <mark>[TODO: 2–3 sentences — the problem set, what we built, my role on the team, and what decided it.]</mark></p>
+    <ul class="body-copy" data-rv style="max-width:62ch;padding-left:1.1rem;display:grid;gap:.5rem">
+      <li>Team: <mark>[TODO: team name and members]</mark></li>
+      <li>Project: <mark>[TODO: project name and one-line description]</mark></li>
+    </ul>
+    <div class="grid-3" style="margin-top:2rem" data-rv>
+      <div class="imgbox" style="aspect-ratio:1/1"><img src="images/hackathon2026_1.jpg" alt="Hackathon 2026 — Vietnam Champion" width="500" height="500" loading="lazy" data-lightbox><span class="img-label">hackathon2026_1.jpg</span></div>
+      <div class="imgbox" style="aspect-ratio:1/1"><img src="images/hackathon2026_2.jpg" alt="Hackathon 2026 team" width="500" height="500" loading="lazy" data-lightbox><span class="img-label">hackathon2026_2.jpg</span></div>
+      <div class="imgbox" style="aspect-ratio:1/1"><img src="images/hackathon2026_3.jpg" alt="Hackathon 2026 award ceremony" width="500" height="500" loading="lazy" data-lightbox><span class="img-label">hackathon2026_3.jpg</span></div>
     </div>
   </div>
 </section>
@@ -1151,6 +1178,26 @@ html.reduce-motion #grain{ animation:none; }
     <div class="grid-2" style="margin-top:2rem" data-rv>
       <div class="imgbox" style="aspect-ratio:16/9"><img src="images/pp2025_main1.jpg" alt="Perfect Pitch 2025" width="960" height="540" loading="lazy" data-lightbox><span class="img-label">pp2025_main1.jpg</span></div>
       <div class="imgbox" style="aspect-ratio:16/9"><img src="images/pp2026_main1.jpg" alt="Perfect Pitch 2026" width="960" height="540" loading="lazy" data-lightbox><span class="img-label">pp2026_main1.jpg</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- GRADUATE CAPSTONE — slots: capstone_1..3.jpg (add via tools/portfolio-admin) -->
+<section class="chapter light-section" id="ch4-capstone" data-rail="capstone" data-rail-full="Graduate Capstone Project">
+  <div class="wrap">
+    <span class="eyebrow"><span class="mono">Graduate Capstone</span> — Best Capstone Project</span>
+    <h2 class="chapter-h" data-split>Graduate Capstone — Best Capstone Project.</h2>
+    <p class="meta" style="color:var(--accent);font-family:'Space Grotesk',monospace;font-size:.85rem;margin-bottom:1rem">Best Capstone Project Award <mark>[TODO: semester / year · awarding body]</mark></p>
+    <p class="body-copy" data-rv style="max-width:62ch">Our capstone team was named Best Capstone Project in the cohort. <mark>[TODO: 2–3 sentences — the client or problem, the system we delivered, my role (requirements, delivery, QA), and the result.]</mark></p>
+    <ul class="body-copy" data-rv style="max-width:62ch;padding-left:1.1rem;display:grid;gap:.5rem">
+      <li>Project: <mark>[TODO: project name]</mark></li>
+      <li>Team and role: <mark>[TODO: team size · my role]</mark></li>
+      <li>Outcome: <mark>[TODO: measurable result or client feedback]</mark></li>
+    </ul>
+    <div class="grid-3" style="margin-top:2rem" data-rv>
+      <div class="imgbox" style="aspect-ratio:16/9"><img src="images/capstone_1.jpg" alt="Capstone project showcase" width="960" height="540" loading="lazy" data-lightbox><span class="img-label">capstone_1.jpg</span></div>
+      <div class="imgbox" style="aspect-ratio:16/9"><img src="images/capstone_2.jpg" alt="Capstone team" width="960" height="540" loading="lazy" data-lightbox><span class="img-label">capstone_2.jpg</span></div>
+      <div class="imgbox" style="aspect-ratio:16/9"><img src="images/capstone_3.jpg" alt="Best Capstone Project award" width="960" height="540" loading="lazy" data-lightbox><span class="img-label">capstone_3.jpg</span></div>
     </div>
   </div>
 </section>
@@ -1289,7 +1336,7 @@ html.reduce-motion #grain{ animation:none; }
 <section class="chapter" id="awards" data-rail="recognition" data-rail-full="07 / releases &amp; tags — Recognition">
   <div class="wrap">
     <span class="eyebrow"><span class="mono">07 / releases &amp; tags</span> — Recognition</span>
-    <h2 class="chapter-h" data-split>Four tags worth pointing at.</h2>
+    <h2 class="chapter-h" data-split>Six tags worth pointing at.</h2>
     <div class="award" data-rv>
       <h3>Inspiring Leaders Award — RMIT Student Leadership Recognition, 2025</h3>
       <p>RMIT's award for students who've shown sustained, values-driven leadership across the university community.</p>
@@ -1299,6 +1346,14 @@ html.reduce-motion #grain{ animation:none; }
       <h3>Top 5 — RMIT Choice Awards</h3>
       <p>Voted into the top five <mark>[TODO: category]</mark> in RMIT's student-choice awards.</p>
       <div class="link-row"><a href="https://www.facebook.com/photo?fbid=1194977572672296&set=a.638345255002200" target="_blank" rel="noopener">View announcement</a></div>
+    </div>
+    <div class="award" data-rv>
+      <h3>Vietnam Champion Award — Hackathon 2026</h3>
+      <p>Our team took the national title at Hackathon 2026. <mark>[TODO: event name]</mark></p>
+    </div>
+    <div class="award" data-rv>
+      <h3>Best Capstone Project — Graduate Capstone</h3>
+      <p>Named Best Capstone Project for our graduate capstone. <mark>[TODO: awarding body / year]</mark></p>
     </div>
     <div class="award" data-rv>
       <h3>Dean's List Award</h3>
@@ -1441,6 +1496,7 @@ function swapToFallback(img){
   var box = img.parentElement;
   if (!box || box.__fellBack) return;
   box.__fellBack = true;
+  if (!box.dataset.slot) box.dataset.slot = img.getAttribute('src') || '';
   var label = box.querySelector('.img-label');
   var name = label ? label.textContent : (img.getAttribute('src')||'image');
   img.remove();
@@ -1591,14 +1647,128 @@ function lbKey(e){
 }
 lbClose.addEventListener('click', closeLightbox);
 lb.addEventListener('click', function(e){ if (e.target === lb) closeLightbox(); });
-qsa('img[data-lightbox]').forEach(function(img){
+function bindLightbox(img){
   img.setAttribute('role','button');
   img.setAttribute('tabindex','0');
   img.setAttribute('aria-label','Enlarge image: ' + (img.alt || 'photo'));
   function go(){ openLightbox(img.currentSrc || img.src, img.alt, img); }
   img.addEventListener('click', go);
   img.addEventListener('keydown', function(e){ if (e.key==='Enter' || e.key===' '){ e.preventDefault(); go(); } });
+}
+qsa('img[data-lightbox]').forEach(bindLightbox);
+
+/* ------------------------------------------------------------------ *
+ * 8b. Media manifest (content/media.json) — written by tools/portfolio-admin.
+ *     "replace" swaps the file behind an existing image slot (matched by its
+ *     original src); "extra" appends new images / mp4 / video links to a section.
+ * ------------------------------------------------------------------ */
+qsa('.imgbox img').forEach(function(img){
+  var box = img.parentElement;
+  if (box && !box.dataset.slot) box.dataset.slot = img.getAttribute('src') || '';
 });
+function safeUrl(u){
+  if (typeof u !== 'string') return '';
+  if (/^(https:\/\/|\/\/)/i.test(u)) return u;
+  if (/^[\w][\w\-./() %]*$/.test(u) && !/^[a-z][a-z0-9+.\-]*:/i.test(u)) return u;
+  return '';
+}
+function toEmbed(u){
+  var m;
+  if ((m = u.match(/(?:youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/)|youtu\.be\/)([\w-]{6,})/i)))
+    return 'https://www.youtube-nocookie.com/embed/' + m[1];
+  if ((m = u.match(/vimeo\.com\/(?:video\/)?(\d+)/i))) return 'https://player.vimeo.com/video/' + m[1];
+  if (/facebook\.com\/.+\/videos\//i.test(u) || /fb\.watch/i.test(u))
+    return 'https://www.facebook.com/plugins/video.php?show_text=false&href=' + encodeURIComponent(u);
+  return /^https:\/\//i.test(u) ? u : '';
+}
+function mkVideo(item){
+  var v = document.createElement('video');
+  v.controls = true; v.preload = 'metadata'; v.playsInline = true;
+  v.src = safeUrl(item.src);
+  if (item.poster && safeUrl(item.poster)) v.poster = safeUrl(item.poster);
+  v.setAttribute('aria-label', item.alt || item.caption || 'Video');
+  return v;
+}
+function mkImage(item){
+  var img = document.createElement('img');
+  img.src = safeUrl(item.src); img.alt = item.alt || '';
+  img.loading = 'lazy'; img.setAttribute('data-lightbox','');
+  if (item.w) img.width = item.w; if (item.h) img.height = item.h;
+  img.addEventListener('error', function(){ swapToFallback(img); });
+  bindLightbox(img);
+  return img;
+}
+function mkEmbed(item){
+  var p = document.createElement('div');
+  p.className = 'poster';
+  var url = toEmbed(item.src);
+  var b = document.createElement('button');
+  b.className = 'pbtn'; b.type = 'button';
+  b.innerHTML = '<span class="play" aria-hidden="true">&#9654;</span><span class="lbl"></span>';
+  b.querySelector('.lbl').textContent = 'Watch — ' + (item.caption || item.alt || 'video');
+  b.addEventListener('click', function(){
+    if (!url) return;
+    var f = document.createElement('iframe');
+    f.src = url;
+    f.setAttribute('allow','autoplay; encrypted-media; fullscreen; picture-in-picture');
+    f.setAttribute('allowfullscreen','');
+    f.setAttribute('title', item.alt || item.caption || 'Embedded video');
+    p.innerHTML = ''; p.appendChild(f);
+  });
+  p.appendChild(b);
+  return p;
+}
+function mkMedia(item){
+  var fig = document.createElement('figure');
+  fig.className = 'mx-item mx-' + item.type;
+  if (item.type === 'video'){ fig.appendChild(mkVideo(item)); }
+  else if (item.type === 'embed'){ fig.appendChild(mkEmbed(item)); }
+  else {
+    var box = document.createElement('div');
+    box.className = 'imgbox';
+    box.dataset.slot = item.src || '';
+    box.style.aspectRatio = item.ratio || '4/3';
+    box.appendChild(mkImage(item));
+    fig.appendChild(box);
+  }
+  if (item.caption){
+    var c = document.createElement('figcaption');
+    c.textContent = item.caption; fig.appendChild(c);
+  }
+  return fig;
+}
+function replaceSlot(box, item){
+  var old = box.querySelector('img, video');
+  var label = box.querySelector('.img-label');
+  if (label) label.remove();
+  box.classList.remove('img-fallback'); box.style.background = ''; box.__fellBack = false;
+  if (old) old.remove();
+  box.appendChild(item.type === 'video' ? mkVideo(item) : mkImage(item));
+}
+function applyMedia(m){
+  if (!m || !m.sections) return;
+  Object.keys(m.sections).forEach(function(id){
+    var sec = document.getElementById(id), cfg = m.sections[id];
+    if (!sec || !cfg) return;
+    (cfg.replace || []).forEach(function(r){
+      if (!r || !safeUrl(r.src)) return;
+      var box = qsa('.imgbox', sec).filter(function(b){ return b.dataset.slot === r.slot; })[0];
+      if (box) replaceSlot(box, r);
+    });
+    var extra = (cfg.extra || []).filter(function(x){ return x && safeUrl(x.src); });
+    if (extra.length){
+      var host = qs('.wrap', sec) || sec;
+      var grid = document.createElement('div');
+      grid.className = 'media-extra';
+      extra.forEach(function(x){ grid.appendChild(mkMedia(x)); });
+      host.appendChild(grid);
+    }
+  });
+}
+fetch('content/media.json', { cache:'no-cache' })
+  .then(function(r){ return r.ok ? r.json() : null; })
+  .then(applyMedia)
+  .catch(function(){ /* no manifest — page keeps its built-in images */ });
 
 /* ------------------------------------------------------------------ *
  * 9. Contact form → Formspree (busy state + toast)

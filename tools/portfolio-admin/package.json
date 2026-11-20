@@ -1,0 +1,11 @@
+{
+  "name": "portfolio-admin",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Local admin tool: scan the portfolio, add images/videos per section, upload to Cloudflare R2, push to git.",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node test/run.js"
+  },
+  "engines": { "node": ">=18" }
+}
