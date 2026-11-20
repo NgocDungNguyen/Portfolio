@@ -1,0 +1,95 @@
+PLACEHOLDERS REMOVED FROM THE LIVE SITE  -  TO ADD BACK LATER
+================================================================
+Everything below was taken off the live website (index.html) so visitors only see
+confirmed facts. Each entry says WHERE it was, WHAT it said, and WHAT you need to provide.
+(Hidden image slots are listed separately in MISSING-IMAGES.md)
+
+
+A. HACKATHON 2026 (section id: ch4-hackathon-2026)
+--------------------------------------------------
+Now shows only: "Vietnam Champion Award" + "Our team received the Vietnam Champion Award at Hackathon 2026."
+Add later (provide the real facts):
+  - Event name, date, city
+  - 2-3 sentences: the problem set, what you built, your role, what decided the win
+  - Team name and members
+  - Project name + one-line description
+Draft wording I had written (NOT real facts, reuse only if true):
+  "We had a tight time limit, a brief we had never seen before, and one rule we kept to: get a working
+   build in front of the judges early, then spend the remaining hours making it better rather than bigger."
+  "I led the team's planning and delivery - scoping the idea down to what we could finish, splitting the work,
+   keeping the build on track, and shaping the final demo and pitch."
+  Meta line had said: "Vietnam Champion Award - 2026 - National final"
+
+
+B. GRADUATE CAPSTONE (section id: ch4-capstone)
+-----------------------------------------------
+Now shows only: "Best Capstone Project Award" + "Our graduate capstone team received the Best Capstone Project award."
+Add later:
+  - Semester / year and who gave the award
+  - 2-3 sentences: the client or problem, the system delivered, your role, the result
+  - Project name
+  - Team size and your role
+  - Measurable outcome or client feedback
+Draft wording I had written (NOT real facts):
+  "The project took a real problem from first requirements through to a working, tested system - the full lifecycle."
+  "My focus was keeping the work structured: gathering and clarifying requirements, planning delivery,
+   coordinating the team, and making sure what we shipped was properly tested and documented."
+  Bullets: Project / Team and role / Outcome (generic wording)
+  Meta line had said: "Best Capstone Project Award - Graduate year"
+
+
+C. AWARDS LIST (section: Recognition)
+-------------------------------------
+  - "Top 5 - RMIT Choice Awards": removed the blank "[TODO: category]". Add the category name:
+    "Voted into the top five <CATEGORY> in RMIT's student-choice awards."
+  - Hackathon 2026 and Capstone entries: removed my padded sentences ("finishing first in the Vietnam field",
+    "chosen as the strongest project in the cohort"). Add the event name / awarding body / year.
+
+
+D. ABOUT SECTION (id: about)
+----------------------------
+  - Referee quote block REMOVED entirely. It said:
+      "[TODO: 1-2 sentences from an RMIT lecturer - analytical ability, ownership, ability to lead peers.]"
+      - [Name, Title, RMIT Vietnam]
+    Add back: a real quote + the lecturer's name and title (with their permission).
+    HTML to restore (put it just before the closing </div> of the about card):
+      <blockquote class="referee" data-rv>"QUOTE"<cite>- NAME, TITLE, RMIT Vietnam</cite></blockquote>
+  - QUT dates: the "[TODO: dates]" after "QUT in Australia" was removed (the education card still shows
+    Jul 2022 - Jun 2023). Add dates to that sentence only if you want them there.
+
+
+E. SMALL BLANKS REMOVED (the sentence now reads fine without them; add detail if you have it)
+----------------------------------------------------------------------------------------------
+  - Seoul 2019/2020 (ch1-2019): "[TODO: confirm]" after "...cut our build and travel time". Confirm the
+    pandemic-constraint claim is accurate.
+  - 2024 mentoring (ch3-2024): "Delivered 6 competition awards across the four teams [TODO: name them]". Name the awards.
+  - 2025 mentoring (ch3-2025): "all 3 took top awards [TODO: which event]". Name the event.
+  - Perfect Pitch (id ch4-pitch): "I came back in 2026 sharper [TODO: result / placement]". Add your placement.
+
+
+F. CASE STUDIES (open with the "Case study" buttons)
+----------------------------------------------------
+  - FPT IS (cs-fpt) Findings: "[TODO: any hard figure]" after "decision-making measurably sped up". Add a number.
+  - FPT IS (cs-fpt) Evidence block REMOVED. Wanted: 2-4 captioned screenshots - agenda template,
+    blocker tracker, before/after duration chart.
+  - BSS Commerce (cs-bss) My role: "Authored requirement documentation for [TODO: product / team]". Add the product/team name.
+  - BSS Commerce (cs-bss) Evidence block REMOVED. Wanted: requirement doc, UAT checklist, hotfix trend,
+    market-research summary.
+  - MatureCare (cs-prj1) Evidence block REMOVED. Wanted: backlog board, SRS excerpt, burndown,
+    acceptance-criteria checklist.
+    HTML to restore an Evidence block (inside .cs-body, after "Impact"):
+      <div><h4>Evidence</h4> ...your captioned screenshots... </div>
+
+
+G. LEFT IN PLACE ON PURPOSE (not text; it is the contact form)
+--------------------------------------------------------------
+  - Contact form still posts to https://formspree.io/f/XXXXXXXX (placeholder endpoint). Until you replace
+    XXXXXXXX with your real Formspree form ID, a visitor who presses "Send request" sees
+    "Form not yet wired". Replace it in index.html (search XXXXXXXX, form id contactForm, plus the HTML
+    comment above it). I did not change this because it is a setting, not wording.
+
+
+H. STYLE FLAG
+-------------
+  - The orange boxed "[TODO: ...]" style (the <mark> tag) is still defined in the CSS. It no longer appears
+    anywhere on the page, but you can reuse it to flag future to-do items.
