@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Portfolio Admin</title>
+<style>
+:root{--bg:#0f0e0c;--panel:#181613;--line:#2b2823;--ink:#ece8df;--dim:#9b958a;--accent:#ff6a3d;--ok:#5fcf80;--bad:#ff6b6b;--warn:#f0b429}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 system-ui,sans-serif}
+button,input,select{font:inherit}
+button{background:var(--accent);color:#fff;border:0;padding:.5rem .9rem;border-radius:6px;cursor:pointer}
+button.ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}
+button.danger{background:transparent;border:1px solid var(--bad);color:var(--bad);padding:.2rem .5rem;font-size:12px}
+button:disabled{opacity:.5;cursor:default}
+input,select{background:#0c0b09;border:1px solid var(--line);color:var(--ink);padding:.45rem .6rem;border-radius:6px;min-width:0}
+header{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center;padding:.8rem 1rem;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--bg);z-index:5}
+header h1{font-size:1rem;margin:0 .6rem 0 0}
+header input[type=url]{flex:1;min-width:220px}
+.pill{font-size:12px;padding:.15rem .55rem;border-radius:99px;border:1px solid var(--line);color:var(--dim)}
+.pill.ok{color:var(--ok);border-color:var(--ok)} .pill.bad{color:var(--warn);border-color:var(--warn)}
+.layout{display:grid;grid-template-columns:300px 1fr;min-height:calc(100vh - 58px)}
+aside{border-right:1px solid var(--line);overflow:auto;max-height:calc(100vh - 58px);position:sticky;top:58px}
+aside input{width:calc(100% - 1.4rem);margin:.7rem}
+.sec{display:flex;justify-content:space-between;gap:.5rem;padding:.55rem .9rem;cursor:pointer;border-left:3px solid transparent}
+.sec:hover{background:var(--panel)} .sec.on{background:var(--panel);border-left-color:var(--accent)}
+.sec small{color:var(--dim);display:block;font-size:11px}
+.badge{font-size:11px;white-space:nowrap;color:var(--dim)} .badge.bad{color:var(--bad)}
+main{padding:1.2rem 1.5rem;max-width:1100px}
+h2{margin:.2rem 0 .1rem;font-size:1.3rem} h3{margin:1.6rem 0 .6rem;font-size:.85rem;text-transform:uppercase;letter-spacing:.08em;color:var(--dim)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:1rem;margin-top:.8rem}
+.texts p,.texts li{margin:.35rem 0} .texts .h{font-weight:700} .todo{background:#f0b42933;padding:0 .2rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:.8rem}
+.tile{border:1px solid var(--line);border-radius:6px;overflow:hidden;background:#0c0b09;display:flex;flex-direction:column}
+.tile .th{aspect-ratio:4/3;background:#1d1a16 center/cover;display:grid;place-items:center;color:var(--dim);font-size:12px;position:relative}
+.tile .th img,.tile .th video{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+.tile .meta{padding:.45rem .55rem;font-size:12px;display:grid;gap:.3rem}
+.tile .meta span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--dim)}
+.st{font-weight:600}.st.ok{color:var(--ok)}.st.bad{color:var(--bad)}
+.drop{border:2px dashed var(--line);border-radius:8px;padding:1.2rem;text-align:center;color:var(--dim)}
+.drop.over{border-color:var(--accent);color:var(--ink)}
+.row{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;margin-top:.6rem}
+.row input{flex:1;min-width:140px}
+#log{white-space:pre-wrap;font:12px/1.5 ui-monospace,monospace;color:var(--dim);margin-top:.6rem}
+.err{color:var(--bad)}
+@media(max-width:800px){.layout{grid-template-columns:1fr}aside{position:static;max-height:240px;border-right:0;border-bottom:1px solid var(--line)}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Portfolio Admin</h1>
+  <input id="site" type="url" placeholder="https://your-site.example/" aria-label="Live site URL">
+  <button id="scanLive">Scan live site</button>
+  <button id="scanLocal" class="ghost">Scan local index.html</button>
+  <span id="r2pill" class="pill">storage…</span>
+  <button id="pushBtn" class="ghost">Push to git…</button>
+</header>
+<div class="layout">
+  <aside><input id="filter" placeholder="Filter sections…" aria-label="Filter sections"><div id="list"></div></aside>
+  <main id="main"><p style="color:var(--dim)">Click <b>Scan live site</b> to list every section, its text and its images.</p></main>
+</div>
+
+<dialog id="pushDlg" style="background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:10px;max-width:560px;width:92vw">
+  <h3 style="margin-top:0">Push to git</h3>
+  <div id="gitInfo" style="font-size:13px;color:var(--dim)"></div>
+  <div class="row"><input id="branch" aria-label="Branch"></div>
+  <div class="row"><input id="msg" value="content: update portfolio media" aria-label="Commit message"></div>
+  <div class="row"><button id="doPush">Commit &amp; push</button><button class="ghost" id="closePush">Close</button></div>
+  <div id="log"></div>
+</dialog>
+
+<script>
+const $ = (s, c = document) => c.querySelector(s);
+const api = async (path, opt = {}) => {
+  const r = await fetch(path, { ...opt, headers: { 'x-admin': '1', ...(opt.headers || {}) } });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(j.error || r.statusText);
+  return j;
+};
+const post = (p, body) => api(p, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) });
+const el = (tag, props = {}, ...kids) => { const e = Object.assign(document.createElement(tag), props); kids.flat().forEach(k => e.append(k)); return e; };
+let state = { data: null, current: null, source: 'live', cfg: null };
+
+async function init() {
+  state.cfg = await api('/api/config');
+  $('#site').value = localStorage.getItem('site') || state.cfg.siteUrl;
+  const p = $('#r2pill');
+  p.textContent = state.cfg.r2.enabled ? `R2: ${state.cfg.r2.bucket}` : 'storage: git only (R2 not set)';
+  p.className = 'pill ' + (state.cfg.r2.enabled ? 'ok' : 'bad');
+  $('#branch').value = state.cfg.branch;
+}
+async function scan(source) {
+  state.source = source;
+  $('#list').textContent = 'Scanning…';
+  try {
+    localStorage.setItem('site', $('#site').value);
+    state.data = await api(`/api/scan?source=${source}&site=${encodeURIComponent($('#site').value)}`);
+    renderList(); select(state.current && state.data.sections.some(s => s.id === state.current) ? state.current : state.data.sections[0].id);
+  } catch (e) { $('#list').replaceChildren(el('p', { className: 'err', textContent: e.message, style: 'padding:1rem' })); }
+}
+function missingCount(s) { return s.images.filter(i => i.status !== 200).length; }
+function renderList() {
+  const f = $('#filter').value.toLowerCase();
+  $('#list').replaceChildren(...state.data.sections.filter(s => (s.title + s.id).toLowerCase().includes(f)).map(s => {
+    const miss = missingCount(s), mf = s.manifest;
+    const added = (mf.extra?.length || 0) + (mf.replace?.length || 0);
+    return el('div', { className: 'sec' + (s.id === state.current ? ' on' : ''), onclick: () => select(s.id) },
+      el('div', {}, s.title.slice(0, 60), el('small', { textContent: s.id })),
+      el('div', { className: 'badge' + (miss ? ' bad' : '') , textContent: `${s.images.length} img${miss ? ` · ${miss} missing` : ''}${added ? ` · +${added}` : ''}` }));
+  }));
+}
+$('#filter').oninput = () => state.data && renderList();
+
+function select(id) {
+  state.current = id; renderList();
+  const s = state.data.sections.find(x => x.id === id);
+  const m = $('#main'); m.replaceChildren();
+  m.append(el('h2', { textContent: s.title }),
+    el('div', { style: 'color:var(--dim)', textContent: `#${s.id}${s.rail ? ' · ' + s.rail : ''} · ${s.theme} · ${s.todoCount} TODO marker(s)` }));
+
+  m.append(el('h3', { textContent: 'Text' }));
+  const t = el('div', { className: 'card texts' });
+  s.blocks.forEach(b => { const x = el(b.tag === 'li' ? 'li' : 'p', { className: /^h\d$/.test(b.tag) ? 'h' : '' }); x.append(...b.text.split(/(\[TODO[^\]]*\])/).map(p => p.startsWith('[TODO') ? el('span', { className: 'todo', textContent: p }) : p)); t.append(x); });
+  if (!s.blocks.length) t.append('No text.');
+  m.append(t);
+
+  m.append(el('h3', { textContent: `Images on the page (${s.images.length})` }));
+  const g = el('div', { className: 'grid' });
+  s.images.forEach(im => {
+    const replaced = (s.manifest.replace || []).find(r => r.slot === im.src);
+    const ok = im.status === 200;
+    const th = el('div', { className: 'th' }, ok ? el('img', { src: im.preview, loading: 'lazy', alt: im.alt }) : 'missing file');
+    const file = el('input', { type: 'file', accept: 'image/*,video/mp4,video/webm', hidden: true, onchange: () => file.files[0] && upload(s.id, [file.files[0]], im.src) });
+    g.append(el('div', { className: 'tile' }, th, el('div', { className: 'meta' },
+      el('span', { textContent: im.src, title: im.src }),
+      el('span', { className: 'st ' + (ok ? 'ok' : 'bad'), textContent: replaced ? 'replaced by upload' : ok ? 'OK' : `missing (${im.status || 'unreachable'})` }),
+      el('button', { className: 'ghost', textContent: replaced ? 'Replace again' : 'Fill this slot', onclick: () => file.click() }), file)));
+  });
+  m.append(g);
+  if (s.embeds.length) m.append(el('div', { className: 'card', textContent: 'Embedded videos: ' + s.embeds.join(' · ') }));
+
+  const mf = s.manifest;
+  const items = [...(mf.replace || []).map((x, i) => ({ x, kind: 'replace', i })), ...(mf.extra || []).map((x, i) => ({ x, kind: 'extra', i }))];
+  m.append(el('h3', { textContent: `Added through this tool (${items.length})` }));
+  const g2 = el('div', { className: 'grid' });
+  items.forEach(({ x, kind, i }) => {
+    const src = /^https?:/.test(x.src) ? x.src : '/repo/' + x.src;
+    const th = el('div', { className: 'th' }, x.type === 'image' ? el('img', { src, alt: x.alt }) : x.type === 'video' ? el('video', { src, muted: true, preload: 'metadata' }) : '▶ ' + x.type);
+    g2.append(el('div', { className: 'tile' }, th, el('div', { className: 'meta' },
+      el('span', { textContent: (kind === 'replace' ? `slot ${x.slot} · ` : '') + x.type, title: x.src }),
+      el('span', { textContent: x.caption || x.alt || x.src }),
+      el('button', { className: 'danger', textContent: 'Remove', onclick: async () => {
+        if (!confirm('Remove from the page? ' + (state.cfg.r2.enabled && x.src.startsWith(state.cfg.r2.publicBase) ? 'Also delete the file from R2?' : '')) ) return;
+        const purge = state.cfg.r2.enabled && x.src.startsWith(state.cfg.r2.publicBase) && confirm('Also delete the file from R2? (OK = delete, Cancel = keep file)');
+        await post('/api/remove', { section: s.id, kind, index: i, purge }); await rescan(); } }))));
+  });
+  if (!items.length) g2.append(el('span', { style: 'color:var(--dim)', textContent: 'Nothing added yet.' }));
+  m.append(g2);
+
+  m.append(el('h3', { textContent: 'Add media to this section' }));
+  const drop = el('div', { className: 'drop', tabIndex: 0 }, 'Drop images / mp4 here, or ', el('b', { textContent: 'click to choose' }));
+  const pick = el('input', { type: 'file', multiple: true, accept: 'image/*,video/mp4,video/webm', hidden: true, onchange: () => upload(s.id, [...pick.files]) });
+  drop.onclick = () => pick.click();
+  drop.onkeydown = e => (e.key === 'Enter' || e.key === ' ') && pick.click();
+  ['dragenter', 'dragover'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('over'); }));
+  ['dragleave', 'drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('over'); }));
+  drop.addEventListener('drop', e => upload(s.id, [...e.dataTransfer.files]));
+  const alt = el('input', { placeholder: 'Alt text / caption (applies to what you add next)', id: 'alt' });
+  const url = el('input', { placeholder: 'Paste image URL, mp4 URL, or YouTube / Vimeo / Facebook video link', id: 'url' });
+  const addUrl = el('button', { textContent: 'Add link', onclick: async () => {
+    try { await post('/api/link', { section: s.id, url: url.value, alt: alt.value, caption: alt.value }); url.value = ''; await rescan(); }
+    catch (e) { note(e.message, true); } } });
+  m.append(el('div', { className: 'card' }, drop, pick, el('div', { className: 'row' }, alt), el('div', { className: 'row' }, url, addUrl), el('div', { id: 'note', className: 'row' })));
+}
+function note(msg, bad) { const n = $('#note'); if (n) n.replaceChildren(el('span', { className: bad ? 'err' : '', textContent: msg })); }
+async function upload(section, files, slot) {
+  for (const f of files) {
+    note(`Uploading ${f.name}…`);
+    try {
+      const q = new URLSearchParams({ section, alt: $('#alt')?.value || '', caption: $('#alt')?.value || '' });
+      if (slot) q.set('slot', slot);
+      const r = await api('/api/upload?' + q, { method: 'POST', headers: { 'x-filename': encodeURIComponent(f.name), 'content-type': 'application/octet-stream' }, body: f });
+      note(`Added ${f.name} → ${r.where === 'r2' ? 'Cloudflare R2' : 'repo (git)'}`);
+    } catch (e) { note(`${f.name}: ${e.message}`, true); return; }
+  }
+  await rescan();
+}
+async function rescan() { const keep = state.current; const n = $('#note')?.textContent; await scan(state.source); select(keep); note(n); }
+
+$('#scanLive').onclick = () => scan('live');
+$('#scanLocal').onclick = () => scan('local');
+$('#pushBtn').onclick = async () => {
+  const g = await api('/api/git');
+  $('#gitInfo').textContent = `Current branch: ${g.branch}\n` + (g.changes.length ? g.changes.join('\n') : 'No pending media changes.');
+  $('#gitInfo').style.whiteSpace = 'pre-wrap'; $('#log').textContent = '';
+  $('#pushDlg').showModal();
+};
+$('#closePush').onclick = () => $('#pushDlg').close();
+$('#doPush').onclick = async () => {
+  $('#doPush').disabled = true; $('#log').textContent = 'Working…';
+  try { const r = await post('/api/push', { branch: $('#branch').value, message: $('#msg').value }); $('#log').textContent = r.log.join('\n'); }
+  catch (e) { $('#log').textContent = 'Error: ' + e.message; }
+  $('#doPush').disabled = false;
+};
+init().catch(e => document.body.prepend(el('p', { className: 'err', textContent: e.message })));
+</script>
+</body>
+</html>

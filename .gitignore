@@ -17,3 +17,6 @@ Thumbs.db
 .playwright-mcp/
 /*.png
 .vscode/
+
+# portfolio-admin tool — secrets stay local
+tools/portfolio-admin/.env
