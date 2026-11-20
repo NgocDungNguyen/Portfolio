@@ -1,4 +1,447 @@
 {
   "version": 1,
-  "sections": {}
+  "sections": {
+    "ch4-hackathon-2026": {
+      "replace": [
+        {
+          "slot": "images/hackathon2026_1.jpg",
+          "type": "image",
+          "src": "https://pub-c6c1950e860c4acf838e97ba4795cc4a.r2.dev/portfolio/ch4-hackathon-2026/55607239729-4cb988822f-o-13b20df3.jpg",
+          "alt": "",
+          "caption": "",
+          "w": 4096,
+          "h": 2731
+        },
+        {
+          "slot": "images/hackathon2026_2.jpg",
+          "type": "image",
+          "src": "https://pub-c6c1950e860c4acf838e97ba4795cc4a.r2.dev/portfolio/ch4-hackathon-2026/55607439870-50dba8f415-o-f6cc7333.jpg",
+          "alt": "",
+          "caption": "",
+          "w": 4096,
+          "h": 2731
+        },
+        {
+          "slot": "images/hackathon2026_3.jpg",
+          "type": "image",
+          "src": "https://pub-c6c1950e860c4acf838e97ba4795cc4a.r2.dev/portfolio/ch4-hackathon-2026/55607158413-f1de765383-o-1802874a.jpg",
+          "alt": "",
+          "caption": "",
+          "w": 4096,
+          "h": 2731
+        }
+      ],
+      "extra": [
+        {
+          "type": "image",
+          "src": "https://pub-c6c1950e860c4acf838e97ba4795cc4a.r2.dev/portfolio/ch4-hackathon-2026/55606012352-208e00b185-o-b7990e4b.jpg",
+          "alt": "",
+          "caption": "",
+          "w": 4096,
+          "h": 2731,
+          "ratio": "4096/2731"
+        },
+        {
+          "type": "image",
+          "src": "https://pub-c6c1950e860c4acf838e97ba4795cc4a.r2.dev/portfolio/ch4-hackathon-2026/55607158358-e8e5c2f1f6-o-3b25ddf2.jpg",
+          "alt": "",
+          "caption": "",
+          "w": 4096,
+          "h": 2731,
+          "ratio": "4096/2731"
+        }
+      ]
+    },
+    "ch4-tapxanh": {
+      "replace": [
+        {
+          "slot": "images/tapxanh_1.jpg",
+          "type": "image",
+          "src": "https://pub-c6c1950e860c4acf838e97ba4795cc4a.r2.dev/portfolio/ch4-tapxanh/chatgpt-image-jun-18-2025-12-31-06-pm-daf9378e.png",
+          "alt": "",
+          "caption": "",
+          "w": 1024,
+          "h": 1536
+        },
+        {
+          "slot": "images/tapxanh_2.jpg",
+          "type": "image",
+          "src": "https://pub-c6c1950e860c4acf838e97ba4795cc4a.r2.dev/portfolio/ch4-tapxanh/ca833b26-8f44-426e-b616-5bb23942421b-4ec2c563.png",
+          "alt": "",
+          "caption": "",
+          "w": 1024,
+          "h": 1024
+        },
+        {
+          "slot": "images/tapxanh_3.jpg",
+          "type": "image",
+          "src": "https://pub-c6c1950e860c4acf838e97ba4795cc4a.r2.dev/portfolio/ch4-tapxanh/54614667841-0a509b875c-o-c56b0da6.jpg",
+          "alt": "",
+          "caption": "",
+          "w": 3000,
+          "h": 2000
+        },
+        {
+          "slot": "images/tapxanh_4.jpg",
+          "type": "image",
+          "src": "https://pub-c6c1950e860c4acf838e97ba4795cc4a.r2.dev/portfolio/ch4-tapxanh/54614886418-3a1df85637-o-146eae80.jpg",
+          "alt": "",
+          "caption": "",
+          "w": 3000,
+          "h": 2000
+        }
+      ],
+      "extra": [
+        {
+          "type": "image",
+          "src": "https://pub-c6c1950e860c4acf838e97ba4795cc4a.r2.dev/portfolio/ch4-tapxanh/z6857544368679-5b08116eecf5ccf77640084022187962-13932eda.jpg",
+          "alt": "",
+          "caption": "",
+          "w": 2560,
+          "h": 1706,
+          "ratio": "1280/853"
+        }
+      ]
+    },
+    "ch5-fpt": {
+      "extra": [
+        {
+          "type": "image",
+          "src": "https://pub-c6c1950e860c4acf838e97ba4795cc4a.r2.dev/portfolio/ch5-fpt/160367ed-6bf3-4294-acd3-fc6e50b0abcb-a9990027.jpg",
+          "alt": "",
+          "caption": "",
+          "w": 2048,
+          "h": 1536,
+          "ratio": "4/3"
+        }
+      ]
+    },
+    "ch3-2023": {
+      "replace": [
+        {
+          "slot": "images/edison_2023_main.jpg",
+          "type": "image",
+          "src": "https://pub-c6c1950e860c4acf838e97ba4795cc4a.r2.dev/portfolio/ch3-2023/420821091-287025901051452-1644654647232307757-n-545e20ab.jpg",
+          "alt": "",
+          "caption": "",
+          "w": 2048,
+          "h": 1153
+        }
+      ],
+      "extra": [
+        {
+          "type": "image",
+          "src": "https://pub-c6c1950e860c4acf838e97ba4795cc4a.r2.dev/portfolio/ch3-2023/z6249990414304-daa8dbf32ed7bb91978e2e4f36030a0b-a768c5be.jpg",
+          "alt": "",
+          "caption": "",
+          "w": 2560,
+          "h": 1920,
+          "ratio": "4/3"
+        },
+        {
+          "type": "image",
+          "src": "https://pub-c6c1950e860c4acf838e97ba4795cc4a.r2.dev/portfolio/ch3-2023/z5096652418118-007-877cb58f5b2d938f00b034d126333-70cc8ca2.jpg",
+          "alt": "",
+          "caption": "",
+          "w": 2560,
+          "h": 1920,
+          "ratio": "4/3"
+        },
+        {
+          "type": "image",
+          "src": "https://pub-c6c1950e860c4acf838e97ba4795cc4a.r2.dev/portfolio/ch3-2023/z5096652418118-012-9be7a3a786fbbf506f94387ebdc3a-1d73755a.jpg",
+          "alt": "",
+          "caption": "",
+          "w": 2560,
+          "h": 1920,
+          "ratio": "4/3"
+        }
+      ]
+    },
+    "ch3-2024": {
+      "extra": [
+        {
+          "type": "image",
+          "src": "https://pub-c6c1950e860c4acf838e97ba4795cc4a.r2.dev/portfolio/ch3-2024/z6331987685960-a4e6984953e26a4398f8c6529c8f78c7-1a56c40c.jpg",
+          "alt": "",
+          "caption": "",
+          "w": 2560,
+          "h": 1920,
+          "ratio": "4/3"
+        },
+        {
+          "type": "image",
+          "src": "https://pub-c6c1950e860c4acf838e97ba4795cc4a.r2.dev/portfolio/ch3-2024/z6329088757733-1deee37e240b0271694a766b7776793e-b030bf9c.jpg",
+          "alt": "",
+          "caption": "",
+          "w": 1926,
+          "h": 2568,
+          "ratio": "3/4"
+        },
+        {
+          "type": "image",
+          "src": "https://pub-c6c1950e860c4acf838e97ba4795cc4a.r2.dev/portfolio/ch3-2024/z6329088787392-8ae83def10e4067deb8a63bd795cb8db-833824a2.jpg",
+          "alt": "",
+          "caption": "",
+          "w": 2568,
+          "h": 1926,
+          "ratio": "4/3"
+        },
+        {
+          "type": "image",
+          "src": "https://pub-c6c1950e860c4acf838e97ba4795cc4a.r2.dev/portfolio/ch3-2024/1c6daa54-9c86-4b1e-a638-0982224bddae-c905797d.jpg",
+          "alt": "",
+          "caption": "",
+          "w": 2048,
+          "h": 1397,
+          "ratio": "2048/1397"
+        },
+        {
+          "type": "image",
+          "src": "https://pub-c6c1950e860c4acf838e97ba4795cc4a.r2.dev/portfolio/ch3-2024/1f6cdc0f-0a07-40e7-a8a5-2968e0c3bc88-eed3c4b8.jpg",
+          "alt": "",
+          "caption": "",
+          "w": 2048,
+          "h": 1220,
+          "ratio": "512/305"
+        },
+        {
+          "type": "image",
+          "src": "https://pub-c6c1950e860c4acf838e97ba4795cc4a.r2.dev/portfolio/ch3-2024/z6857559573727-cba5c5763c14516f1b7f24c58f80d2b1-00ec3b1c.jpg",
+          "alt": "",
+          "caption": "",
+          "w": 1784,
+          "h": 2370,
+          "ratio": "892/1185"
+        }
+      ]
+    },
+    "ch3-2025": {
+      "extra": [
+        {
+          "type": "image",
+          "src": "https://pub-c6c1950e860c4acf838e97ba4795cc4a.r2.dev/portfolio/ch3-2025/z7494967185355-c280c3eaa9b7495910281347cf960bff-f22324e5.jpg",
+          "alt": "",
+          "caption": "",
+          "w": 2560,
+          "h": 1920,
+          "ratio": "4/3"
+        },
+        {
+          "type": "image",
+          "src": "https://pub-c6c1950e860c4acf838e97ba4795cc4a.r2.dev/portfolio/ch3-2025/628067107-122178370178587713-6245638298624215929-38fd08a9.jpg",
+          "alt": "",
+          "caption": "",
+          "w": 2048,
+          "h": 1365,
+          "ratio": "2048/1365"
+        },
+        {
+          "type": "image",
+          "src": "https://pub-c6c1950e860c4acf838e97ba4795cc4a.r2.dev/portfolio/ch3-2025/627980054-122178369776587713-7091614266951764274-f33d99ed.jpg",
+          "alt": "",
+          "caption": "",
+          "w": 2048,
+          "h": 1365,
+          "ratio": "2048/1365"
+        },
+        {
+          "type": "image",
+          "src": "https://pub-c6c1950e860c4acf838e97ba4795cc4a.r2.dev/portfolio/ch3-2025/627605769-122178370118587713-8734094857378588880-00bc7d10.jpg",
+          "alt": "",
+          "caption": "",
+          "w": 2048,
+          "h": 1365,
+          "ratio": "2048/1365"
+        },
+        {
+          "type": "image",
+          "src": "https://pub-c6c1950e860c4acf838e97ba4795cc4a.r2.dev/portfolio/ch3-2025/z7493172243840-a049f26d0c646de1b389786358afe40e-397f6c27.jpg",
+          "alt": "",
+          "caption": "",
+          "w": 2560,
+          "h": 1707,
+          "ratio": "2560/1707"
+        },
+        {
+          "type": "image",
+          "src": "https://pub-c6c1950e860c4acf838e97ba4795cc4a.r2.dev/portfolio/ch3-2025/z7493172259025-410c92073c16db1b56ef55f6d504b962-2b84856b.jpg",
+          "alt": "",
+          "caption": "",
+          "w": 2560,
+          "h": 1707,
+          "ratio": "2560/1707"
+        },
+        {
+          "type": "image",
+          "src": "https://pub-c6c1950e860c4acf838e97ba4795cc4a.r2.dev/portfolio/ch3-2025/z7493182725967-967242bbb7de45801863980634440a80-4c0a15a1.jpg",
+          "alt": "",
+          "caption": "",
+          "w": 2568,
+          "h": 1444,
+          "ratio": "642/361"
+        },
+        {
+          "type": "image",
+          "src": "https://pub-c6c1950e860c4acf838e97ba4795cc4a.r2.dev/portfolio/ch3-2025/z7493182773733-a045d0eb87735fde0d2c88ef06044c50-94366d56.jpg",
+          "alt": "",
+          "caption": "",
+          "w": 2568,
+          "h": 1444,
+          "ratio": "642/361"
+        }
+      ]
+    },
+    "ch3-ai": {
+      "replace": [
+        {
+          "slot": "images/ai_add1.jpg",
+          "type": "image",
+          "src": "https://pub-c6c1950e860c4acf838e97ba4795cc4a.r2.dev/portfolio/ch3-ai/490717652-596380146782691-1500093282144823773-n--52a16667.jpg",
+          "alt": "",
+          "caption": "",
+          "w": 2048,
+          "h": 1365
+        }
+      ],
+      "extra": [
+        {
+          "type": "image",
+          "src": "https://pub-c6c1950e860c4acf838e97ba4795cc4a.r2.dev/portfolio/ch3-ai/490408088-596379600116079-3000722654233695862-n-47d72fbd.jpg",
+          "alt": "",
+          "caption": "",
+          "w": 2048,
+          "h": 1365,
+          "ratio": "2048/1365"
+        },
+        {
+          "type": "image",
+          "src": "https://pub-c6c1950e860c4acf838e97ba4795cc4a.r2.dev/portfolio/ch3-ai/dsc02158-c95bf3b9.jpg",
+          "alt": "",
+          "caption": "",
+          "w": 6000,
+          "h": 4000,
+          "ratio": "3/2"
+        },
+        {
+          "type": "image",
+          "src": "https://pub-c6c1950e860c4acf838e97ba4795cc4a.r2.dev/portfolio/ch3-ai/1776220150539-1062224413714010799-10622244137140-3c12b6db.jpg",
+          "alt": "",
+          "caption": "",
+          "w": 1926,
+          "h": 2568,
+          "ratio": "3/4"
+        },
+        {
+          "type": "image",
+          "src": "https://pub-c6c1950e860c4acf838e97ba4795cc4a.r2.dev/portfolio/ch3-ai/674174260-895947573492612-7446482891584949537-n-43d13958.jpg",
+          "alt": "",
+          "caption": "",
+          "w": 2048,
+          "h": 1365,
+          "ratio": "2048/1365"
+        },
+        {
+          "type": "image",
+          "src": "https://pub-c6c1950e860c4acf838e97ba4795cc4a.r2.dev/portfolio/ch3-ai/670143869-895947590159277-8722321534636919127-n-1d6bee16.jpg",
+          "alt": "",
+          "caption": "",
+          "w": 2048,
+          "h": 1365,
+          "ratio": "2048/1365"
+        },
+        {
+          "type": "image",
+          "src": "https://pub-c6c1950e860c4acf838e97ba4795cc4a.r2.dev/portfolio/ch3-ai/670619406-895948050159231-2266588254065879341-n-6379e802.jpg",
+          "alt": "",
+          "caption": "",
+          "w": 1536,
+          "h": 2048,
+          "ratio": "3/4"
+        },
+        {
+          "type": "image",
+          "src": "https://pub-c6c1950e860c4acf838e97ba4795cc4a.r2.dev/portfolio/ch3-ai/671281471-895946910159345-176734491533714426-n-aefd2658.jpg",
+          "alt": "",
+          "caption": "",
+          "w": 2048,
+          "h": 1365,
+          "ratio": "2048/1365"
+        }
+      ]
+    },
+    "ch4-sset": {
+      "replace": [
+        {
+          "slot": "images/sset_main.jpg",
+          "type": "image",
+          "src": "https://pub-c6c1950e860c4acf838e97ba4795cc4a.r2.dev/portfolio/ch4-sset/54630938272-dec82e748b-o-6a0908be.png",
+          "alt": "",
+          "caption": "",
+          "w": 2048,
+          "h": 1365
+        }
+      ],
+      "extra": [
+        {
+          "type": "image",
+          "src": "https://pub-c6c1950e860c4acf838e97ba4795cc4a.r2.dev/portfolio/ch4-sset/54632009099-411c96de79-o-ec068dbc.png",
+          "alt": "",
+          "caption": "",
+          "w": 2048,
+          "h": 1365,
+          "ratio": "2048/1365"
+        },
+        {
+          "type": "image",
+          "src": "https://pub-c6c1950e860c4acf838e97ba4795cc4a.r2.dev/portfolio/ch4-sset/54631803296-5f7477870f-o-64e92ecb.png",
+          "alt": "",
+          "caption": "",
+          "w": 2048,
+          "h": 1365,
+          "ratio": "2048/1365"
+        },
+        {
+          "type": "image",
+          "src": "https://pub-c6c1950e860c4acf838e97ba4795cc4a.r2.dev/portfolio/ch4-sset/54630939037-34970cd485-o-dceea11f.png",
+          "alt": "",
+          "caption": "",
+          "w": 2048,
+          "h": 1365,
+          "ratio": "2048/1365"
+        },
+        {
+          "type": "image",
+          "src": "https://pub-c6c1950e860c4acf838e97ba4795cc4a.r2.dev/portfolio/ch4-sset/54632103880-e9632a567c-o-7afc5514.png",
+          "alt": "",
+          "caption": "",
+          "w": 2048,
+          "h": 1365,
+          "ratio": "2048/1365"
+        }
+      ]
+    },
+    "ch2-uniqlo": {
+      "replace": [
+        {
+          "slot": "images/uniqlo_1.jpg",
+          "type": "image",
+          "src": "https://pub-c6c1950e860c4acf838e97ba4795cc4a.r2.dev/portfolio/ch2-uniqlo/z6857563146396-389c6b3ac7b13f19f0891c139b6f7a49-de83b9d9.jpg",
+          "alt": "",
+          "caption": "",
+          "w": 2560,
+          "h": 1920
+        },
+        {
+          "slot": "images/uniqlo_2.jpg",
+          "type": "image",
+          "src": "https://pub-c6c1950e860c4acf838e97ba4795cc4a.r2.dev/portfolio/ch2-uniqlo/z6856236071711-8ca4875ecce107870a63fd72478ba2c9-1e3a6849.jpg",
+          "alt": "",
+          "caption": "",
+          "w": 1153,
+          "h": 2560
+        }
+      ]
+    }
+  }
 }
