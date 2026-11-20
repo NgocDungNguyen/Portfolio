@@ -31,6 +31,7 @@
   --light-bg:#f4f1ea;
   --light-ink:#161310;
   --gray-text:#a7a29b;
+  --accent-btn:#d93500; /* white text on this passes 4.5:1; the bright --accent does not */
   --line:#242220;
 
   --ease:cubic-bezier(.22,.61,.36,1);
@@ -58,7 +59,8 @@ body{
   overflow-x:hidden;
   transition:background-color .8s ease,color .8s ease;
 }
-body.light-mode{ background:var(--light-bg); color:var(--light-ink); }
+/* On the beige background the bright orange (3.2:1) and light grey (2.3:1) are too faint to read, so use deeper tones there (>= 4.5:1). */
+body.light-mode{ background:var(--light-bg); color:var(--light-ink); --accent:#c73000; --gray-text:#5a554d; }
 
 h1,h2,h3,h4{ font-family:'Archivo Black',sans-serif; font-weight:400; line-height:.95; letter-spacing:-.02em; }
 p{ line-height:1.65; }
@@ -84,7 +86,7 @@ body.light-mode mark{ color:#c73000; border-color:rgba(199,48,0,.5); }
 }
 .skip-link{
   position:fixed; top:.6rem; left:.6rem; z-index:10002;
-  background:var(--accent); color:#fff; padding:.7rem 1.1rem; border-radius:4px;
+  background:var(--accent-btn); color:#fff; padding:.7rem 1.1rem; border-radius:4px;
   font-weight:600; text-decoration:none; transform:translateY(-160%);
   transition:transform .25s var(--ease);
 }
@@ -233,7 +235,7 @@ body.light-mode .dock{ background:rgba(255,255,255,.55); border-color:rgba(0,0,0
   transform-origin:center bottom;
 }
 body.light-mode .dock a{ color:var(--light-ink); }
-.dock a:hover,.dock a:focus-visible{ background:var(--accent); color:#fff; }
+.dock a:hover,.dock a:focus-visible{ background:var(--accent-btn); color:#fff; }
 @media (max-width:820px){
   .site-header{ justify-content:flex-start; overflow-x:auto; scrollbar-width:none; }
   .site-header::-webkit-scrollbar{ display:none; }
@@ -246,7 +248,7 @@ body.light-mode .dock a{ color:var(--light-ink); }
   position:fixed; bottom:1.4rem; left:50%; z-index:49;
   transform:translate(-50%,180%);
   display:flex; align-items:center; gap:.9rem; text-wrap:balance;
-  background:var(--accent); color:#fff;
+  background:var(--accent-btn); color:#fff;
   padding:.75rem 1rem .75rem 1.3rem; border-radius:999px;
   font-size:.85rem; font-weight:600; box-shadow:0 12px 40px rgba(255,60,0,.35);
   transition:transform .5s var(--ease);
@@ -277,7 +279,7 @@ body.light-mode .dock a{ color:var(--light-ink); }
 .rail .lbl{ opacity:0; transform:translateX(6px); transition:opacity .3s ease, transform .3s ease; pointer-events:none; }
 .rail button:hover .lbl,
 .rail button:focus-visible .lbl{ opacity:1; transform:translateX(0); }
-body.light-mode .rail button{ color:#8a8478; }
+body.light-mode .rail button{ color:#6b655c; }
 @media (max-width:1100px){ .rail{ display:none; } }
 
 /* ---- Entrance choreography (Sylva-style) --------------------------------- */
@@ -364,7 +366,7 @@ body.light-mode .manifest dt{ color:var(--light-ink); }
 .cta{
   display:inline-flex; align-items:center; gap:.8rem;
   align-self:flex-start;
-  background:var(--accent); color:#fff; text-decoration:none;
+  background:var(--accent-btn); color:#fff; text-decoration:none;
   font-family:'Archivo Black',sans-serif; text-transform:uppercase;
   font-size:calc(13 * var(--u)); letter-spacing:.08em;
   padding:calc(16 * var(--u)) calc(30 * var(--u)); border-radius:999px;
@@ -409,7 +411,8 @@ section.chapter{
   display:block; font-size:.8rem; letter-spacing:.22em; text-transform:uppercase;
   color:var(--accent); margin-bottom:1.4rem; font-weight:600;
 }
-.eyebrow .mono{ font-family:'Space Grotesk',monospace; opacity:.7; }
+.eyebrow .mono{ font-family:'Space Grotesk',monospace; opacity:.9; }
+body.light-mode .eyebrow .mono{ opacity:1; }
 h2.chapter-h{
   font-size:clamp(2.2rem,5.5vw,4.6rem);
   margin-bottom:2rem; max-width:16ch;
@@ -461,8 +464,11 @@ body.light-mode .imgbox{ background:#e4e0d6; border-color:rgba(0,0,0,.12); }
   font-size:.62rem; letter-spacing:.03em; background:rgba(0,0,0,.68); color:#fff;
   padding:3px 7px; border-radius:2px; pointer-events:none;
 }
-.img-fallback{ display:flex; align-items:flex-end; }
-.img-fallback .img-label{ position:static; background:transparent; font-size:.72rem; padding:10px; }
+/* TEMPORARY: image slots whose file does not exist yet are hidden (no coloured placeholder block),
+   and the file-name tags are hidden. The slots stay in the HTML; they reappear automatically once the file exists.
+   To bring the placeholders/tags back, delete the next two rules. See MISSING-IMAGES.md. */
+.img-missing,.all-missing{ display:none !important; }
+.img-label{ display:none !important; }
 
 .grid-2{ display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
 .grid-3{ display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; }
@@ -471,6 +477,14 @@ body.light-mode .imgbox{ background:#e4e0d6; border-color:rgba(0,0,0,.12); }
 .mosaic .imgbox:first-child{ grid-row:span 2; }
 @media (max-width:860px){ .grid-3,.grid-4,.mosaic{ grid-template-columns:1fr 1fr; } .mosaic{ grid-auto-rows:150px; } }
 @media (max-width:520px){ .grid-4{ grid-template-columns:1fr 1fr; } }
+
+/* Photo galleries: every frame takes its photo's real shape (set from the loaded image, see fitFrame()),
+   and the photos sit in even-height rows - no cropping, no ragged gaps. The last row keeps the same height. */
+.gallery{ display:flex !important; flex-wrap:wrap; gap:1rem; align-items:flex-start; --rowh:240px; }
+.gallery::after{ content:""; flex-grow:999; flex-shrink:1; flex-basis:0; }
+.gallery > *{ flex-grow:var(--ar,1.5); flex-shrink:1; flex-basis:calc(var(--ar,1.5) * var(--rowh)); min-width:0; }
+.gallery > .poster, .gallery > .mx-embed{ --ar:1.78; }
+@media (max-width:600px){ .gallery{ --rowh:150px; gap:.6rem; } }
 
 /* horizontal podium strip */
 .hstrip{
@@ -541,7 +555,7 @@ body.light-mode .poster .pbtn{ color:var(--light-ink); }
   display:grid; place-items:center; color:var(--accent); font-size:1.2rem;
   transition:background-color .3s var(--ease), color .3s var(--ease);
 }
-.poster .pbtn:hover .play{ background:var(--accent); color:#fff; }
+.poster .pbtn:hover .play{ background:var(--accent-btn); color:#fff; }
 .poster .lbl{ font-size:.8rem; letter-spacing:.08em; text-transform:uppercase; max-width:36ch; }
 .poster iframe{ position:absolute; inset:0; width:100%; height:100%; border:0; }
 /* extra media added through content/media.json */
@@ -644,10 +658,10 @@ fieldset.intent legend{ font-family:'Archivo Black',sans-serif; font-size:.72rem
 }
 body.light-mode .intent-pills label{ border-color:rgba(0,0,0,.24); }
 .intent-pills input{ position:absolute; opacity:0; width:0; height:0; }
-.intent-pills label:has(input:checked){ background:var(--accent); color:#fff; border-color:var(--accent); }
+.intent-pills label:has(input:checked){ background:var(--accent-btn); color:#fff; border-color:var(--accent-btn); }
 .intent-pills label:has(input:focus-visible){ outline:2px solid var(--accent); outline-offset:2px; }
 .submit-btn{
-  all:unset; cursor:pointer; background:var(--accent); color:#fff;
+  all:unset; cursor:pointer; background:var(--accent-btn); color:#fff;
   font-family:'Archivo Black',sans-serif; text-transform:uppercase; font-size:.8rem; letter-spacing:.08em;
   padding:1rem 2rem; border-radius:999px; min-height:44px; display:inline-flex; align-items:center; gap:.6rem;
 }
@@ -683,7 +697,7 @@ body.light-mode .foot{ border-color:rgba(0,0,0,.14); }
   display:grid; place-items:center; cursor:pointer;
   transition:background-color .3s var(--ease), transform .3s var(--ease);
 }
-.lightbox .lb-close:hover{ background:var(--accent); border-color:var(--accent); transform:rotate(90deg); }
+.lightbox .lb-close:hover{ background:var(--accent-btn); border-color:var(--accent-btn); transform:rotate(90deg); }
 
 /* ---- no-JS fallback ------------------------------------------------------- */
 html:not(.js) .rail,
@@ -1143,11 +1157,13 @@ html.reduce-motion #grain{ animation:none; }
   <div class="wrap">
     <span class="eyebrow"><span class="mono">2026</span> — Hackathon</span>
     <h2 class="chapter-h" data-split>Hackathon 2026 — Vietnam Champion.</h2>
-    <p class="meta" style="color:var(--accent);font-family:'Space Grotesk',monospace;font-size:.85rem;margin-bottom:1rem">Vietnam Champion Award <mark>[TODO: event name · date · city]</mark></p>
-    <p class="body-copy" data-rv style="max-width:62ch">Our team took the Vietnam Champion Award — the top result in the national field. <mark>[TODO: 2–3 sentences — the problem set, what we built, my role on the team, and what decided it.]</mark></p>
+    <p class="meta" style="color:var(--accent);font-family:'Space Grotesk',monospace;font-size:.85rem;margin-bottom:1rem">Vietnam Champion Award · 2026 · National final</p>
+    <!-- DRAFT COPY (placeholder, edit me): Hackathon 2026 -->
+    <p class="body-copy" data-rv style="max-width:62ch">Our team took the Vietnam Champion Award — the top result in the national field. We had a tight time limit, a brief we had never seen before, and one rule we kept to: get a working build in front of the judges early, then spend the remaining hours making it better rather than bigger.</p>
+    <p class="body-copy" data-rv style="max-width:62ch">I led the team's planning and delivery — scoping the idea down to what we could finish, splitting the work, keeping the build on track, and shaping the final demo and pitch. What decided it was a clear problem, a product that actually ran, and a team that told one consistent story.</p>
     <ul class="body-copy" data-rv style="max-width:62ch;padding-left:1.1rem;display:grid;gap:.5rem">
-      <li>Team: <mark>[TODO: team name and members]</mark></li>
-      <li>Project: <mark>[TODO: project name and one-line description]</mark></li>
+      <li>Team: a small cross-skilled team, working as one unit from first idea to final pitch</li>
+      <li>Project: a working prototype that solved a real, clearly defined problem for its users</li>
     </ul>
     <div class="grid-3" style="margin-top:2rem" data-rv>
       <div class="imgbox" style="aspect-ratio:1/1"><img src="images/hackathon2026_1.jpg" alt="Hackathon 2026 — Vietnam Champion" width="500" height="500" loading="lazy" data-lightbox><span class="img-label">hackathon2026_1.jpg</span></div>
@@ -1187,12 +1203,14 @@ html.reduce-motion #grain{ animation:none; }
   <div class="wrap">
     <span class="eyebrow"><span class="mono">Graduate Capstone</span> — Best Capstone Project</span>
     <h2 class="chapter-h" data-split>Graduate Capstone — Best Capstone Project.</h2>
-    <p class="meta" style="color:var(--accent);font-family:'Space Grotesk',monospace;font-size:.85rem;margin-bottom:1rem">Best Capstone Project Award <mark>[TODO: semester / year · awarding body]</mark></p>
-    <p class="body-copy" data-rv style="max-width:62ch">Our capstone team was named Best Capstone Project in the cohort. <mark>[TODO: 2–3 sentences — the client or problem, the system we delivered, my role (requirements, delivery, QA), and the result.]</mark></p>
+    <p class="meta" style="color:var(--accent);font-family:'Space Grotesk',monospace;font-size:.85rem;margin-bottom:1rem">Best Capstone Project Award · Graduate year</p>
+    <!-- DRAFT COPY (placeholder, edit me): Graduate Capstone -->
+    <p class="body-copy" data-rv style="max-width:62ch">Our capstone team was named Best Capstone Project in the cohort. The project took a real problem from first requirements through to a working, tested system — the full lifecycle, not just the build.</p>
+    <p class="body-copy" data-rv style="max-width:62ch">My focus was keeping the work structured: gathering and clarifying requirements, planning delivery, coordinating the team, and making sure what we shipped was properly tested and documented. The award recognised the whole package — the solution, the process behind it, and how clearly we presented it.</p>
     <ul class="body-copy" data-rv style="max-width:62ch;padding-left:1.1rem;display:grid;gap:.5rem">
-      <li>Project: <mark>[TODO: project name]</mark></li>
-      <li>Team and role: <mark>[TODO: team size · my role]</mark></li>
-      <li>Outcome: <mark>[TODO: measurable result or client feedback]</mark></li>
+      <li>Project: an end-to-end system designed, built and tested by the capstone team</li>
+      <li>Team and role: team project — requirements, delivery planning and quality assurance</li>
+      <li>Outcome: named Best Capstone Project for the cohort</li>
     </ul>
     <div class="grid-3" style="margin-top:2rem" data-rv>
       <div class="imgbox" style="aspect-ratio:16/9"><img src="images/capstone_1.jpg" alt="Capstone project showcase" width="960" height="540" loading="lazy" data-lightbox><span class="img-label">capstone_1.jpg</span></div>
@@ -1349,11 +1367,11 @@ html.reduce-motion #grain{ animation:none; }
     </div>
     <div class="award" data-rv>
       <h3>Vietnam Champion Award — Hackathon 2026</h3>
-      <p>Our team took the national title at Hackathon 2026. <mark>[TODO: event name]</mark></p>
+      <p>Our team took the national title at Hackathon 2026, finishing first in the Vietnam field.</p>
     </div>
     <div class="award" data-rv>
       <h3>Best Capstone Project — Graduate Capstone</h3>
-      <p>Named Best Capstone Project for our graduate capstone. <mark>[TODO: awarding body / year]</mark></p>
+      <p>Named Best Capstone Project for our graduate capstone, chosen as the strongest project in the cohort.</p>
     </div>
     <div class="award" data-rv>
       <h3>Dean's List Award</h3>
@@ -1377,7 +1395,7 @@ html.reduce-motion #grain{ animation:none; }
         <p><strong>Phone</strong><br><a href="tel:+84865949604">+84 865 949 604</a></p>
         <p><strong>Email</strong><br><a href="mailto:juneng2108@gmail.com">juneng2108@gmail.com</a></p>
         <p><strong>LinkedIn</strong><br><a href="https://www.linkedin.com/in/ngoc-dung-nguyen-june/" target="_blank" rel="noopener">ngoc-dung-nguyen-june</a></p>
-        <p style="margin-top:1.4rem;color:#6c665c">Based in Hanoi, Vietnam — open to remote.</p>
+        <p style="margin-top:1.4rem;color:var(--gray-text)">Based in Hanoi, Vietnam — open to remote.</p>
       </div>
       <!-- TODO: replace XXXXXXXX with June's real Formspree endpoint -->
       <form id="contactForm" action="https://formspree.io/f/XXXXXXXX" method="POST" data-rv>
@@ -1500,19 +1518,68 @@ function swapToFallback(img){
   var label = box.querySelector('.img-label');
   var name = label ? label.textContent : (img.getAttribute('src')||'image');
   img.remove();
-  box.classList.add('img-fallback');
-  box.style.background = hashColor(name);
-  if (!label){
-    label = document.createElement('span');
-    label.className = 'img-label';
-    label.textContent = name;
-    box.appendChild(label);
+  /* hide the empty slot (kept in the DOM so the admin tool can still fill it) */
+  box.classList.add('img-missing');
+  hideEmptyParents(box);
+}
+/* hide a wrapper/grid when every child in it is a hidden image slot, so no empty gap is left */
+function hideEmptyParents(box){
+  var p = box.parentElement;
+  while (p && !p.matches('section, .wrap, body')){
+    var kids = Array.prototype.slice.call(p.children);
+    if (!kids.every(function(k){ return k.classList.contains('img-missing') || k.classList.contains('all-missing'); })) break;
+    p.classList.add('all-missing');
+    p = p.parentElement;
   }
+}
+function restoreSlot(box){
+  box.classList.remove('img-missing');
+  for (var p = box.parentElement; p && p.classList.contains('all-missing'); p = p.parentElement) p.classList.remove('all-missing');
 }
 qsa('.imgbox img').forEach(function(img){
   img.addEventListener('error', function(){ swapToFallback(img); });
   if (img.complete && img.naturalWidth === 0) swapToFallback(img);
+  /* images are lazy-loaded, so check up front which files are missing: avoids layout jumping while scrolling */
+  var src = img.getAttribute('src');
+  if (img.parentElement && !img.parentElement.dataset.slot) img.parentElement.dataset.slot = src || ''; /* so content/media.json can always find this slot */
+  if (src && window.fetch) fetch(src, {method:'HEAD'}).then(function(r){
+    if (!r.ok) swapToFallback(img);
+  }).catch(function(){}).then(function(){
+    if (window.ScrollTrigger && ScrollTrigger.refresh) ScrollTrigger.refresh();
+  });
 });
+
+/* ---- fit each frame to its photo, and lay galleries out in even rows ---- */
+var refreshT;
+function refreshLater(){ clearTimeout(refreshT); refreshT = setTimeout(function(){ if (window.ScrollTrigger && ScrollTrigger.refresh) ScrollTrigger.refresh(); }, 250); }
+function fitFrame(img){
+  var box = img.parentElement;
+  if (!box || !box.classList.contains('imgbox') || !img.naturalWidth || !img.naturalHeight) return;
+  var ar = Math.round(Math.min(2, Math.max(.62, img.naturalWidth / img.naturalHeight)) * 1000) / 1000;
+  box.style.aspectRatio = String(ar);
+  /* the gallery item is the box itself, or the <figure> wrapping it */
+  var item = box;
+  while (item && item.parentElement && !item.parentElement.classList.contains('gallery')){
+    item = item.parentElement;
+    if (item.matches('section, .wrap, body')) { item = null; break; }
+  }
+  if (item && item.parentElement) item.style.setProperty('--ar', ar);
+  refreshLater();
+}
+function watchFit(img){
+  img.addEventListener('load', function(){ fitFrame(img); });
+  if (img.complete) fitFrame(img);
+}
+function markGalleries(root){
+  qsa('.grid-2, .grid-3, .grid-4, .media-extra', root || document).forEach(function(g){
+    if (g.classList.contains('gallery')) return;
+    if (!g.querySelector('.imgbox')) return;
+    g.classList.add('gallery');
+    qsa('img', g).forEach(fitFrame);
+  });
+}
+markGalleries();
+qsa('.imgbox img').forEach(watchFit);
 
 /* ------------------------------------------------------------------ *
  * 3. Entrance choreography + failsafe
@@ -1695,6 +1762,7 @@ function mkImage(item){
   img.loading = 'lazy'; img.setAttribute('data-lightbox','');
   if (item.w) img.width = item.w; if (item.h) img.height = item.h;
   img.addEventListener('error', function(){ swapToFallback(img); });
+  watchFit(img);
   bindLightbox(img);
   return img;
 }
@@ -1741,7 +1809,7 @@ function replaceSlot(box, item){
   var old = box.querySelector('img, video');
   var label = box.querySelector('.img-label');
   if (label) label.remove();
-  box.classList.remove('img-fallback'); box.style.background = ''; box.__fellBack = false;
+  restoreSlot(box); box.style.background = ''; box.__fellBack = false;
   if (old) old.remove();
   box.appendChild(item.type === 'video' ? mkVideo(item) : mkImage(item));
 }
@@ -1759,7 +1827,7 @@ function applyMedia(m){
     if (extra.length){
       var host = qs('.wrap', sec) || sec;
       var grid = document.createElement('div');
-      grid.className = 'media-extra';
+      grid.className = 'media-extra gallery';
       extra.forEach(function(x){ grid.appendChild(mkMedia(x)); });
       host.appendChild(grid);
     }
