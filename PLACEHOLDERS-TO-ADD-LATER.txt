@@ -81,12 +81,10 @@ F. CASE STUDIES (open with the "Case study" buttons)
       <div><h4>Evidence</h4> ...your captioned screenshots... </div>
 
 
-G. LEFT IN PLACE ON PURPOSE (not text; it is the contact form)
---------------------------------------------------------------
-  - Contact form still posts to https://formspree.io/f/XXXXXXXX (placeholder endpoint). Until you replace
-    XXXXXXXX with your real Formspree form ID, a visitor who presses "Send request" sees
-    "Form not yet wired". Replace it in index.html (search XXXXXXXX, form id contactForm, plus the HTML
-    comment above it). I did not change this because it is a setting, not wording.
+G. CONTACT FORM  -  DONE (no longer a placeholder)
+--------------------------------------------------
+  - Wired to Formspree form xkjrzdbw (https://formspree.io/f/xkjrzdbw). Messages go to juneng2108@gmail.com.
+    Manage it / read submissions at https://formspree.io/forms/xkjrzdbw/submissions
 
 
 H. STYLE FLAG
